@@ -5,9 +5,12 @@ import {
     Route,
     Navigate
 } from "react-router-dom";
-import './App.css';
+import "./App.css";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 import About from "./Pages/About";
+import Merge from "./Pages/Merge";
 
 class Menu extends React.Component {
     constructor(props) {
@@ -34,19 +37,17 @@ class Menu extends React.Component {
     }
 
     onDemoClick() {
-        this.setState({ contentChoice: "demo" },
-            () => alert(this.state.contentChoice));
+        this.setState({ contentChoice: "demo" });
 
     }
 
     onEasyClick() {
-        this.setState({ contentChoice: "easy" },
-            () => alert(this.state.contentChoice));
+        this.setState({ contentChoice: "easy" });
+        this.setState({ redirect: "/Merge" });
     }
 
     onHardClick() {
-        this.setState({ contentChoice: "hard" },
-            () => alert(this.state.contentChoice));
+        this.setState({ contentChoice: "hard" });
     }
 
     render() {
@@ -89,18 +90,21 @@ class Menu extends React.Component {
 }
 
 function App() {
-  return (
-      <div className="App">
-          <h1>App Name</h1>
-          <Router>
+    return (
+        <DndProvider backend={HTML5Backend}>
+            <div className="App">
+            <h1>App Name</h1>
+            <Router>
               <Routes>
                   <Route exact path="/" element={<Menu/>} />
                   <Route exact path="/About" element={<About />} />
+                  <Route exact path="/Merge" element={<Merge />} />
                   {/*<Route path="*" element={<NoPage />} />*/}
               </Routes>
-          </Router>
-      </div>
-  );
+            </Router>
+            </div>
+        </DndProvider>
+    );
 }
 
 export default App;
