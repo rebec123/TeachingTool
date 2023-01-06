@@ -9,7 +9,7 @@ function Element({ id, contents }) {
             isDragging: !!monitor.isDragging(),
         })
     }))
-    return (<div className="array-element" ref={ drag } style={{ "backgroundColor": isDragging ? "blue" : "pink" }}>{ contents }</div>);
+    return (<div className="array-element" ref={ drag } style={{ "backgroundColor": isDragging ? "grey" : "white" }}>{ contents }</div>);
 }
 
 export default Element;

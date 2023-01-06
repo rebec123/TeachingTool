@@ -32,7 +32,7 @@ class Menu extends React.Component {
     }
 
     onAboutClick() {
-        this.setState({ redirect: "/About" });//ToDo:add thing to go back to algo selection menu on about page
+        this.setState({ redirect: "/About" });
 
     }
 
@@ -93,7 +93,6 @@ function App() {
     return (
         <DndProvider backend={HTML5Backend}>
             <div className="App">
-            <h1>App Name</h1>
             <Router>
               <Routes>
                   <Route exact path="/" element={<Menu/>} />
