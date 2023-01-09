@@ -55,23 +55,18 @@
 
 .array, .array-split-once, .array-split-twice, .array-split-thrice {
     border: 3px solid green;
-    width: 100%;
+    width: 99%;
     height: auto;
     margin: auto;
+    margin-top: 10px;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.array-split-once {
-    width: 50%;
-}
-
-.array-split-twice {
-    width: 25%;
-}
-.array-split-thrice {
-    width: 12.5%;
+.array-and-div {
+    border: 3px solid yellow;
+    width: 100%;
 }
 
 .element-target {
