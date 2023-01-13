@@ -1,13 +1,13 @@
 //import React, { useState } from "react";
 import React from "react";
-import Element from "../Components/Element";
-import { useDrop } from "react-dnd";
-import { toBeVisible } from "../../node_modules/@testing-library/jest-dom/dist/to-be-visible";
+//import Element from "../Components/Element";
+import { useDrop, useDrag } from "react-dnd";
+//import { toBeVisible } from "../../node_modules/@testing-library/jest-dom/dist/to-be-visible";
 
-const algorithm = ["mergeSort(A)", "If array length > 1", "Split the array in to two halves: S1 and S2",
+/*const algorithm = ["mergeSort(A)", "If array length > 1", "Split the array in to two halves: S1 and S2",
     "call mergeSort(S1)", "call mergeSort(S2)", "call merge(S1, S2, A)", "\n", "merge(S1, S2, A)",
     "i = 0, j = 0, k = 0", "while (i < p and j < q)", "if S1[i] <= S2[j]", "A[k] = S1[i]", "i = i + 1", "else", "A[k] = S2[j]", "j = j + 1",
-    "k = k + 1", "if i = p", "Copy S2[j,…, q - 1] to A", "else", "Copy S1[i,…, p - 1] to A"];
+    "k = k + 1", "if i = p", "Copy S2[j,…, q - 1] to A", "else", "Copy S1[i,…, p - 1] to A"];*/
 const elementList = [
     {
         id: 1,
@@ -76,12 +76,27 @@ const elementList = [
 
 ]
 
+function Element({ id, contents }) {
+    const [{ isDragging }, drag] = useDrag(() => ({
+        type: "single-element",//ToDo: use enums instead of string eventually
+        item: { id: id },
+        collect: (monitor) => ({
+            isDragging: !!monitor.isDragging(),
+        })
+    }))
+    return (<div className="array-element" ref={drag} style={{ "backgroundColor": isDragging ? "grey" : "white" }}>{contents}</div>);
+}
+
 class Merge extends React.Component {
     constructor(props) {
         super(props);
+        //GOOD TO KNOW: page is re-rendered everything you set state
+        //do not change state INSIDE render, because you will get stuck in endless loop and hang!
         this.state = {
-            name: " ",
-            visibleDivs: [1]
+            title: "Merge Sort",
+            visibleDivs: [1],
+            //title: "Merge Sort",
+            ordered: [] //an array of divs containing arrays that are ordered (including single-element arrays which are ordered by definition)
         }; 
     }
 
@@ -129,7 +144,7 @@ class Merge extends React.Component {
             let divHalved = div / 2;
             parent = this.getElementsByDiv(Math.floor(divHalved));
             if (divHalved - Math.floor(divHalved) === 0) {
-                return this.getChildLeft(parent);
+                return this.getChildLeft(parent);    
             }
             else if (divHalved - Math.floor(divHalved) === 0.5) {
                 return this.getChildRight(parent);
@@ -162,6 +177,9 @@ class Merge extends React.Component {
         }
     }
 
+    //code totally freaks out when this added :( just trying to make array of divs that are ready to merge
+    //The when a parent sees its two children are ready, the merge code can be triggered
+
     //Given an array (the parent), this function returns the children that would appear
     //To the right of the array (the right half of the array's elements)
     getChildRight(parent) {
@@ -182,18 +200,48 @@ class Merge extends React.Component {
         }
     }
 
+    //Idea: when new elements added to ordered, check every time if ready to merge
+    isMergePossible() {
+        if (this.state.ordered.includes(16) && this.state.ordered.includes(17)) {
+            return true;
+        }
+        return false;
+    }
+
     //Given a parent div, this function adds the index of the two children divs to a state array "visibleDivs"
     //VisibleDivs are the divs that are visible to the user (e.g. after user has split div 1, they can see it's children: div 2 and 3)
     onSplitClick(div) {
         //children are div*2 and div*2+1
-        let newElements = [];
+        let newlyVisible = [];
+        let newOrdered = [];
+        let canMerge = false;
+        let newTitle = "Merge Sort ;p"
         if (!this.state.visibleDivs.includes(div * 2)) {
-            newElements.push(div * 2);
+            newlyVisible.push(div * 2);
+            if (this.getElementsByDiv(div * 2).length === 1) {
+                newOrdered.push(div * 2);
+            }
         }
         if (!this.state.visibleDivs.includes((div * 2) + 1)) {
-            newElements.push((div * 2)+1);
+            newlyVisible.push((div * 2) + 1);
+            if (this.getElementsByDiv((div * 2)+1).length === 1) {
+                newOrdered.push((div * 2)+1);
+            }
         }
-        this.setState({ visibleDivs: [...this.state.visibleDivs, ...newElements ]});
+
+        canMerge = this.isMergePossible();
+        if (canMerge) {
+            newTitle = "Can Merge!!!!";
+        }
+
+        this.setState({
+            visibleDivs: [...this.state.visibleDivs, ...newlyVisible],
+            ordered: [...this.state.ordered, ...newOrdered],
+            title: newTitle
+        },
+            () => console.log(this.state.ordered),   
+        );
+        
     }
 
     row1 = () => {
@@ -314,10 +362,9 @@ class Merge extends React.Component {
     }
 
     render() {
-        //ToDo: is it centeal???
         return (
             <>
-            <h1>Merge Sort</h1>
+                <h1>{this.state.title}</h1>
                 <div className="stage">
                     <div className="sub-stage">
                         <div className="array">{ elementList.map((element) => {
@@ -330,7 +377,6 @@ class Merge extends React.Component {
                     {this.row2()}
                     {this.row3()}
                     {this.row4()}
-                    {console.log(this.state.visibleDivs)}
                 </div>
             </>
         );
