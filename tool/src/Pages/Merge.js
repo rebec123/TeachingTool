@@ -101,6 +101,7 @@ class Merge extends React.Component {
 
     componentDidMount() {
         let allNewArrays = [];
+        allNewArrays.push({});//Filling in index to make the maths and logic throughout simpler (we consider original array to be index 1, not 0)
         for (let i = 1; i <= _kMaxNumOfDivs; i++) {
             let _merged = false;
             let _readyToMerge = false;//not sure weather we need to calc this from beginning?
@@ -123,13 +124,13 @@ class Merge extends React.Component {
         );
     }
 
-    componentDidUpdate(prevProps, prevState) {
+    /*componentDidUpdate(prevProps, prevState) {
         if (
-            this.state.arrays !== prevState.arrays//not sure this correct "arrays"
+            this.state.arrays !== prevState.arrays//think we need to check if smthn else changed?
         ) {
             this.isMergePossible(16);
         }
-    }
+    }*/
 
     //Given a div (a position in the graph formed by splitting an array in half recursively), this
     //function returns the array elements that should be in that sub array
@@ -230,14 +231,21 @@ class Merge extends React.Component {
             return ['Sub array length unexpected'];
         }
     }
-    //got here, "can merge :)" not printing, we need to check we can update the "ready to merge status of arrays from here, good luck
+
+    //got here! Can update "readyToMerge" var, just need to do the logic so it only does it when appropriate
     //Idea: when new elements added to ordered, check every time if ready to merge
     isMergePossible(i) {//ToDo: logic wrong, just temporary for testing. Implement properly
-        if (this.state.arrays[i].readyToMerge) {
-            console.log("Can merge :)");
-            this.setState(prev => ({
-                arrays: prev.arrays.map(array => array.index === i ? { ...array, readyToMerge: true } : array)
-            }))
+        if (!this.state.arrays[i].readyToMerge) {
+            console.log("i is: " + i);
+            let oldArrays = this.state.arrays;
+            this.setState({
+                arrays: oldArrays.map(
+                    ar => (ar.index === i ? Object.assign(ar, { readyToMerge: true }) : ar)
+                ),
+                title: "hiyaaaa"
+            },
+                () => console.log(this.state.arrays)
+            );
             return true;
             
         }
@@ -246,12 +254,10 @@ class Merge extends React.Component {
 
     //Given a parent div, this function adds the index of the two child divs to a state array "visibleDivs"
     //VisibleDivs are the divs that are visible to the user (e.g. after user has split div 1, they can see it's children: div 2 and 3)
-    //Arrays of length 1 are added to "ordered" list (1 element arrays are ordered by definition)
     onSplitClick(div) {
         //children are div*2 and div*2+1
         let newlyVisible = [];
         let canMerge = false;
-        let newTitle = "Merge Sortttt"
         if (!this.state.visibleDivs.includes(div * 2)) {
             newlyVisible.push(div * 2);
         }
@@ -259,16 +265,12 @@ class Merge extends React.Component {
             newlyVisible.push((div * 2) + 1);
         }
 
-        /*canMerge = this.isMergePossible();
-        if (canMerge) {
-            newTitle = "Can Merge!!!!";
-        }*/
+        canMerge = this.isMergePossible(div);
+        //console.log(this.state.arrays);
 
         this.setState({
-            visibleDivs: [...this.state.visibleDivs, ...newlyVisible],
-            title: newTitle
-        }
-        );
+            visibleDivs: [...this.state.visibleDivs, ...newlyVisible]
+        });
         
     }
 
