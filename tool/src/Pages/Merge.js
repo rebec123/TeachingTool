@@ -76,7 +76,7 @@ const elementList = [
 
 ]
 const _kMaxNumOfDivs = 31;
-function Element({ id, contents }) {
+function Element({ id, contents, style }) {
     const [{ isDragging }, drag] = useDrag(() => ({
         type: "single-element",//ToDo: use enums instead of string eventually
         item: { id: id },
@@ -84,7 +84,7 @@ function Element({ id, contents }) {
             isDragging: !!monitor.isDragging(),
         })
     }))
-    return (<div className="array-element" ref={drag} style={{ "backgroundColor": isDragging ? "grey" : "white" }}>{contents}</div>);
+    return (<div className={style} ref={drag} style={{ "backgroundColor": isDragging ? "grey" : "white" }}>{contents}</div>);
 }
 
 class Merge extends React.Component {
@@ -94,14 +94,15 @@ class Merge extends React.Component {
         //do not change state INSIDE render, because you will get stuck in endless loop and hang!
         this.state = {
             title: "Merge Sort",
+            mode: "splitting",//ToDo:change to merging when in merge mode, this should disable split buttons until meregd??
             visibleDivs: [1],
             arrays: []//all sub arrays that will be produced by split and some useful info about them
         }; 
     }
 
-    componentDidMount() {
+    componentWillMount() {
         let allNewArrays = [];
-        allNewArrays.push({});//Filling in index to make the maths and logic throughout simpler (we consider original array to be index 1, not 0)
+        allNewArrays.push({});
         for (let i = 1; i <= _kMaxNumOfDivs; i++) {
             let _merged = false;
             let _readyToMerge = false;//not sure weather we need to calc this from beginning?
@@ -113,7 +114,9 @@ class Merge extends React.Component {
                 index: i,
                 contents: _contents,
                 merged: _merged,
-                readyToMerge: _readyToMerge
+                readyToMerge: _readyToMerge,//TODO: IMPORTANT! ready to merge might be redundant?? have a close look and get rid if necessary
+                //would there ever be a point where two divs are ready to be merged, so we'd need a status to keep track? I don't think so...
+                style: "ar-el"
             }
             allNewArrays.push(newArrayDetails);
         }
@@ -125,15 +128,16 @@ class Merge extends React.Component {
     }
 
     /*componentDidUpdate(prevProps, prevState) {
-        if (
-            this.state.arrays !== prevState.arrays//think we need to check if smthn else changed?
-        ) {
-            this.isMergePossible(16);
+        if (this.state.arrays !== prevState.arrays) {
+            console.log("Arrays changed, calling merge");//code to start merge: change colours, add text telling them to drag, empty div, check if new contents of div are ordered.
+            //once an array is merged, readToMerge set back to false, merged set to true
+            merge();
         }
     }*/
 
     //Given a div (a position in the graph formed by splitting an array in half recursively), this
     //function returns the array elements that should be in that sub array
+    //Could implement memoization (saves result of calls incase called again, like cache)
     getElementsByDiv(div) {
         let parentLen = 0;
         let lowerBound = 0;
@@ -232,24 +236,45 @@ class Merge extends React.Component {
         }
     }
 
+    //code to start merge: change colours, add text telling them to drag, empty div, check if new contents of div are ordered.
+    //once an array is merged, readToMerge set back to false, merged set to true
+    merge(parent, child1, child2) {
+        console.log("Called!!")
+        let oldArrays = this.state.arrays;
+        let newContents = this.state.arrays[parent].contents.map(el => Object.assign(el, {contents: " "}))
+        this.setState({
+            arrays: oldArrays.map(
+                ar => ((ar.index !== parent && ar.index !== child1 && ar.index !== child2) ? Object.assign(ar, { style: "ar-el-grey" }) : ar)
+            ),
+            arrays: oldArrays.map(
+                ar => ((ar.index === parent) ? Object.assign(ar, { contents: newContents }) : ar)//uh-oh! this changes all eements, not just specific div
+                //we need to maskesure all contents are their own thing and not refs to element list i think
+            )
+        },
+            () => console.log(this.state.arrays)
+        );
+    }
+
     //got here! Can update "readyToMerge" var, just need to do the logic so it only does it when appropriate
     //Idea: when new elements added to ordered, check every time if ready to merge
-    isMergePossible(i) {//ToDo: logic wrong, just temporary for testing. Implement properly
-        if (!this.state.arrays[i].readyToMerge) {
-            console.log("i is: " + i);
+    isMergePossible(i) {//ToDo: if two children (or one child) merged, then parent is ready to merge
+        //add error checking for if i or kids out of bounds
+        let child1 = i * 2;
+        let child2 = (i * 2) + 1;
+        if (this.state.arrays[child1].merged && this.state.arrays[child2].merged) {
+            console.log(i + " is ready to merge");
             let oldArrays = this.state.arrays;
             this.setState({
                 arrays: oldArrays.map(
                     ar => (ar.index === i ? Object.assign(ar, { readyToMerge: true }) : ar)
-                ),
-                title: "hiyaaaa"
+                )
             },
-                () => console.log(this.state.arrays)
+                () => this.merge(i, child1, child2)//so merge is only called AFTER
             );
-            return true;
-            
         }
-        return false;
+        else {//temp
+            console.log(i + " is not ready to merge");
+        }
     }
 
     //Given a parent div, this function adds the index of the two child divs to a state array "visibleDivs"
@@ -265,7 +290,7 @@ class Merge extends React.Component {
             newlyVisible.push((div * 2) + 1);
         }
 
-        canMerge = this.isMergePossible(div);
+        this.isMergePossible(div);
         //console.log(this.state.arrays);
 
         this.setState({
@@ -274,17 +299,31 @@ class Merge extends React.Component {
         
     }
 
+    row0 = () => {
+        return (
+            <>
+                <div className="sub-stage">
+                    <div className="array">{this.state.arrays[1].contents.map((element) => {
+                    return <Element contents={element.contents} id={element.id} style={this.state.arrays[1].style} />
+                })}
+                </div>
+            </div>
+            <button className="split" onClick={() => { this.onSplitClick(1) }} >split</button>
+            </>
+        )
+    }
+
     row1 = () => {
         const result = [];
         for (let i = 2; i < 4; i++) {
-            let elements = this.getElementsByDiv(i);
+            let elements = this.state.arrays[i].contents;
             if (this.state.visibleDivs.includes(i)) {
                 result.push(
                     <div className="array-and-div">
                         <div className="array-split">
                             {
                                 elements?.map((element) => {
-                                    return <Element contents={element.contents} id={element.id} />
+                                    return <Element contents={element.contents} id={element.id} style={this.state.arrays[i].style} />
                                 })
                             }
                         </div>
@@ -307,14 +346,14 @@ class Merge extends React.Component {
     row2 = () => {
         const result = [];
         for (let i = 4; i < 8; i++) {
-            let elements = this.getElementsByDiv(i);
+            let elements = this.state.arrays[i].contents;
             if (this.state.visibleDivs.includes(i)) {
                 result.push(
                     <div className="array-and-div">
                         <div className="array-split">
                             {
                                 elements?.map((element) => {
-                                    return <Element contents={element.contents} id={element.id} />
+                                    return <Element contents={element.contents} id={element.id} style={this.state.arrays[i].style} />
                                 })}
                         </div>
                         <button className="split" onClick={() => this.onSplitClick(i) } >split</button>
@@ -335,7 +374,7 @@ class Merge extends React.Component {
     row3 = () => {
         const result = [];
         for (let i = 8; i < 16; i++) {
-            let elements = this.getElementsByDiv(i);
+            let elements = this.state.arrays[i].contents;
             let addSplit = "";
             if (elements.length > 1) {
                 addSplit = <button className="split" onClick={() => this.onSplitClick(i) } >split</button>;
@@ -346,7 +385,7 @@ class Merge extends React.Component {
                         <div className="array-split">
                             {
                                 elements?.map((element) => {
-                                    return <Element contents={element.contents} id={element.id} />
+                                    return <Element contents={element.contents} id={element.id} style={this.state.arrays[i].style} />
                                 })}
                         </div>
                         {addSplit}
@@ -367,14 +406,14 @@ class Merge extends React.Component {
     row4 = () => {//Note: didn't add split buttons beacuse length should be max 1 so don't need to split furthur
         const result = [];
         for (let i = 16; i < 32; i++) {
-            let elements = this.getElementsByDiv(i);
+            let elements = this.state.arrays[i].contents;
             if (this.state.visibleDivs.includes(i)) {
                 result.push(
                     <div className="array-and-div">
                         <div className="array-split">
                             {
                                 elements?.map((element) => {
-                                    return <Element contents={element.contents} id={element.id} />
+                                    return <Element contents={element.contents} id={element.id} style={this.state.arrays[i].style} />
                                 })}
                         </div>
                     </div >
@@ -396,13 +435,7 @@ class Merge extends React.Component {
             <>
                 <h1>{this.state.title}</h1>
                 <div className="stage">
-                    <div className="sub-stage">
-                        <div className="array">{ elementList.map((element) => {
-                        return <Element contents={element.contents} id={ element.id }/>
-                        })}
-                    </div>
-                    </div>
-                    <button className="split" onClick={() => { this.onSplitClick(1) }} >split</button>
+                    {this.row0()}
                     {this.row1()}
                     {this.row2()}
                     {this.row3()}

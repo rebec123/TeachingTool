@@ -47,9 +47,17 @@
     display: flex;
 }
 
-.array-element {
+.ar-el {
     font-size: 2em;
+    color: black;
     border: 3px solid black;
+    width: 50px;
+}
+
+.ar-el-grey {
+    font-size: 2em;
+    color: grey;
+    border: 3px solid grey;
     width: 50px;
 }
 
