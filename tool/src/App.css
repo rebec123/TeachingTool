@@ -1,3 +1,6 @@
+:root {
+    --button-height: 25px;
+}
 .App {
   text-align: center;
 }
@@ -46,6 +49,15 @@
 .sub-stage {
     display: flex;
 }
+.btn-split {
+    height: var(--button-height);
+    border: 1px solid black;
+}
+
+.size-of-button {
+    height: var(--button-height);
+    border: 1px solid white;
+}
 
 .ar-el {
     font-size: 2em;
@@ -79,7 +91,10 @@
 
 .element-target {
     border: 3px solid red;
-    width: 300px;
-    height: 100px;
-    vertical-align: top;
+    width: 99%;
+    height: 47px;
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
