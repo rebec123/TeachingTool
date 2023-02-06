@@ -1,5 +1,5 @@
 :root {
-    --button-height: 25px;
+    --button-height: 30px;
 }
 .App {
   text-align: center;
@@ -49,7 +49,7 @@
 .sub-stage {
     display: flex;
 }
-.btn-split {
+.btn-split, .btn-merge {
     height: var(--button-height);
     border: 1px solid black;
 }

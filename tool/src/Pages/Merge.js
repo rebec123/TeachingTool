@@ -227,38 +227,36 @@ function Merge() {
         collect: (monitor) => ({
             isOver: !!monitor.isOver(),
         }),
+        droppedItems:[],
     }))
+
+    useEffect(
+        () => {
+            for (let i = 0; i < mergeArray.length; i++) {
+                console.log("id: " + mergeArray[i].id);
+                console.log("value: " + mergeArray[i].contents);
+            }
+        },
+        [
+            mergeArray
+        ]
+    )
 
     //use this for user swapping positions of elements in array
     const mergeElement = (id) => {//this could edit arrays instead? give it a div num
         const latestElement = elementList.filter((element) => id === element.id);
-        setMergeArray((mergeArray) => [...mergeArray, latestElement[0]]); //adds multiple elements into array
-    }
-
-    /*useEffect(() => {
-        let allNewArrays = [];
-        for (let i = 2; i <= _kMaxNumOfDivs; i++) {
-            let _merged = false;
-            let _readyToMerge = false;
-            let _contents = getElementsByDiv(i);
-            if (_contents.length <= 1) {//ToDo:also add code to check if sub array already ordered?
-                _merged = true;
-            }
-            let newArrayDetails = {
-                index: i,
-                contents: _contents,
-                merged: _merged,
-                readyToMerge: _readyToMerge,//TODO: IMPORTANT! ready to merge might be redundant?? have a close look and get rid if necessary
-                //would there ever be a point where two divs are ready to be merged, so we'd need a status to keep track? I don't think so...
-                style: "ar-el"
-            }
-            allNewArrays.push(newArrayDetails);
+        let foundAMatch = false;
+        //mergeArray.map(el => console.log("el.id " + el.id); el.id === id ? foundAMatch = true : foundAMatch = foundAMatch);
+        /*for (let i = 0; i < mergeArray.length; i++) {
+            console.log("id: " + mergeArray[i].id);
+        }*/
+        //ToDo: VERY IMPORTANT- only allow one of each id in the target zone!
+        if (true) {
+            setMergeArray(mergeArray=>[...mergeArray, latestElement[0]]);
+            console.log("new merge array: " + mergeArray);
+    
         }
-
-        setArrays([...arrays, ...allNewArrays])
-        console.log(arrays);
-
-    }, [])//Important! Empty array means this code is only ran once!*/
+    }
 
     //Should split button disappear as soon as split? avoids confusion, looks cleaner
     //A "merge" button could go in it's place during merge time?
@@ -268,20 +266,16 @@ function Merge() {
     const mergeMode = (parent, child1, child2) => {
         console.log("Called!!")
         let oldArrays = arrays;
-        let newContents = arrays[parent].contents.map(el => Object.assign(el, { contents: "_" }))
-        /*BEEN CHANGED, CHECK STILL WORKS!!! using old arrays twice might not vibe with it*/
+        //let newContents = arrays[parent].contents.map(el => Object.assign(el, { contents: "_" }));
+        setDivToMerge(parent);
         setArrays(oldArrays.map(
             ar => ((ar.index !== parent && ar.index !== child1 && ar.index !== child2) ? Object.assign(ar, { style: "ar-el-grey" }) : ar)
         ));
-        setArrays(oldArrays.map(
+        /*setArrays(oldArrays.map(
             ar => ((ar.index === parent) ? Object.assign(ar, { contents: newContents }) : ar)
-        ));
-        setDivToMerge(parent);
-        console.log(arrays);
+        ));*/
     }
 
-    //got here! Can update "readyToMerge" var, just need to do the logic so it only does it when appropriate
-    //Idea: when new elements added to ordered, check every time if ready to merge
     const isMergePossible = (i) => {//ToDo: if two children (or one child) merged, then parent is ready to merge
         //add error checking for if i or kids out of bounds
         let child1 = i * 2;
@@ -319,6 +313,43 @@ function Merge() {
 
     }
 
+    const onMergeClick = (div) => {
+        let sorted = true;
+        for (let i = 0; i < mergeArray.length - 1; i++) {
+            if (mergeArray[i].contents > mergeArray[i + 1].contents) { sorted = false; break; }
+        }
+        if (sorted) {
+            console.log("It's ordered!")
+            let oldArrays = arrays;
+            setArrays(oldArrays.map(
+                ar => (Object.assign(ar, { style: "ar-el" })
+                )));
+            setArrays(oldArrays.map(
+                ar => (ar.index === div ? Object.assign(ar, { contents: mergeArray, merged: true, readyToMerge: false }) : ar)
+            ));
+            setTitle("Merge Sort");//ToDo: change to helper text instead of title
+            setDivToMerge(0);
+            setMergeArray([]);
+            //Got to here: remove children from visible divs
+        }
+        else {
+            setTitle("Not quite...");//ToDo: change to helper text instead of title
+            setMergeArray([]);
+        }
+        //check merge array
+        //if ordered, set array contents to that, ungrey everything, set that div back to non-target element, set merge array to nothing
+        //if not ordered a)reset
+    }
+
+    //Pass the index of the div, determine appropriate button out of: split or placeholder
+    const determineButton = (div) => {
+        let addButton = <div className="size-of-button" />;
+        if (!visibleDivs.includes(div * 2)) {
+            addButton = <button className="btn-split" onClick={() => onSplitClick(div)} >split</button>;
+        }
+        return addButton;
+    }
+
     const row0 = () => {
         let addButton = <div className="size-of-button" />;
         if (!visibleDivs.includes(2)) {
@@ -332,7 +363,7 @@ function Merge() {
                     })}
                     </div>
                 </div>
-                {addButton}
+                {determineButton(1)}
             </>
         )
     }
@@ -356,12 +387,12 @@ function Merge() {
                                     })
                                 }
                             </div>
-                            {addButton}
+                            {determineButton(i)}
                         </div>
 
                     );
                 }
-                else {//we still need to fill up the space where the array will go (to keep the layout intact)
+                else {
                     result.push(<div className="array-and-div" />);
                 }
             }
@@ -373,7 +404,7 @@ function Merge() {
             </div>
         );
     }
-    //need plceholder to go where button is so elements don't move aorund
+
     const row2 = () => {
         const result = [];
         for (let i = 4; i < 8; i++) {
@@ -391,7 +422,7 @@ function Merge() {
                                     return <Element contents={element.contents} id={element.id} style={arrays[i].style} />
                                 })}
                         </div>
-                        {addButton}
+                        {determineButton(i)}
                     </div>
                 );
             }
@@ -425,7 +456,7 @@ function Merge() {
                                     return <Element contents={element.contents} id={element.id} style="ar-el" />
                                 })}
                             </div>
-                            {addButton}
+                            <button className="btn-merge" onClick={() => onMergeClick(i)} >merge</button>
                         </div>
                     );
                 }
@@ -438,7 +469,7 @@ function Merge() {
                                         return <Element contents={element.contents} id={element.id} style={arrays[i].style} />
                                     })}
                             </div>
-                            {addButton}
+                            {determineButton(i)}
                         </div>
                     );
                 }
