@@ -232,10 +232,10 @@ function Merge() {
 
     useEffect(
         () => {
-            for (let i = 0; i < mergeArray.length; i++) {
+            /*for (let i = 0; i < mergeArray.length; i++) {
                 console.log("id: " + mergeArray[i].id);
                 console.log("value: " + mergeArray[i].contents);
-            }
+            }*/
         },
         [
             mergeArray
@@ -243,7 +243,7 @@ function Merge() {
     )
 
     //use this for user swapping positions of elements in array
-    const mergeElement = (id) => {//this could edit arrays instead? give it a div num
+    const mergeElement = (id) => {
         const latestElement = elementList.filter((element) => id === element.id);
         let foundAMatch = false;
         //mergeArray.map(el => console.log("el.id " + el.id); el.id === id ? foundAMatch = true : foundAMatch = foundAMatch);
@@ -251,6 +251,7 @@ function Merge() {
             console.log("id: " + mergeArray[i].id);
         }*/
         //ToDo: VERY IMPORTANT- only allow one of each id in the target zone!
+        //Also! make sure all elements have been added (ensure user can't leave one out and get away with it)
         if (true) {
             setMergeArray(mergeArray=>[...mergeArray, latestElement[0]]);
             console.log("new merge array: " + mergeArray);
@@ -315,12 +316,14 @@ function Merge() {
 
     const onMergeClick = (div) => {
         let sorted = true;
+        //Checking if the array is sorted
         for (let i = 0; i < mergeArray.length - 1; i++) {
             if (mergeArray[i].contents > mergeArray[i + 1].contents) { sorted = false; break; }
         }
         if (sorted) {
-            console.log("It's ordered!")
             let oldArrays = arrays;
+
+            //Setting arrays back to black and updating variables of newly merged array
             setArrays(oldArrays.map(
                 ar => (Object.assign(ar, { style: "ar-el" })
                 )));
@@ -328,74 +331,110 @@ function Merge() {
                 ar => (ar.index === div ? Object.assign(ar, { contents: mergeArray, merged: true, readyToMerge: false }) : ar)
             ));
             setTitle("Merge Sort");//ToDo: change to helper text instead of title
+            //Resetting merge state values
             setDivToMerge(0);
             setMergeArray([]);
-            //Got to here: remove children from visible divs
+
+            //Removing the merged array's children from user's view
+            let newVisDivs = visibleDivs.filter(d => d !== div * 2 && d !== (div * 2) + 1);
+            console.log("newVisDivs: " + newVisDivs);
+            setVisibleDivs(newVisDivs);
+
+            //Checking if the div's parent is ready to be merged now
+            console.log("Chekcing if " + Math.floor(div / 2) + " ready to be merged now...");
+            isMergePossible(Math.floor(div / 2));
         }
         else {
             setTitle("Not quite...");//ToDo: change to helper text instead of title
             setMergeArray([]);
         }
-        //check merge array
-        //if ordered, set array contents to that, ungrey everything, set that div back to non-target element, set merge array to nothing
-        //if not ordered a)reset
     }
 
     //Pass the index of the div, determine appropriate button out of: split or placeholder
-    const determineButton = (div) => {
+    const determineButton = (div) => {//not length! chekc if merged!!
         let addButton = <div className="size-of-button" />;
-        if (!visibleDivs.includes(div * 2)) {
+        //console.log("merged? " + arrays[div].merged);
+        if (!visibleDivs.includes(div * 2) && !arrays[div].merged) {
             addButton = <button className="btn-split" onClick={() => onSplitClick(div)} >split</button>;
         }
         return addButton;
     }
 
     const row0 = () => {
-        let addButton = <div className="size-of-button" />;
-        if (!visibleDivs.includes(2)) {
-            addButton = <button className="btn-split" onClick={() => onSplitClick(1)} >split</button>;
-        }
-        return (
-            <>
+        const result = []; 
+        let i = 1;
+        if (divToMerge === i) {
+            result.push(
+                <>
                 <div className="sub-stage">
-                    <div className="array">{arrays[1].contents.map((element) => {
-                        return <Element contents={element.contents} id={element.id} style={arrays[1].style} />
-                    })}
+                    <div className="array-and-div">
+                        <div className="element-target" ref={drop} >
+                        {mergeArray.map((element) => {
+                            return <Element contents={element.contents} id={element.id} style="ar-el" />
+                        })}
+                        </div>
                     </div>
                 </div>
-                {determineButton(1)}
-            </>
-        )
+                <button className="btn-merge" onClick={() => onMergeClick(i)} >merge</button>
+                </>
+            );
+        }
+        else {
+            result.push(
+                <>
+                <div className="sub-stage">
+                    <div className="array">{arrays[i].contents.map((element) => {
+                        return <Element contents={element.contents} id={element.id} style={arrays[i].style} />
+                    })}
+                    </div>
+                    
+                </div>
+                {determineButton(i)}
+                </>
+            );
+        }
+        return (
+           result
+        );
     }
 
     const row1 = () => {
         const result = [];
         for (let i = 2; i < 4; i++) {
-            if (arrays[i].contents !== undefined) {
-                let elements = arrays[i].contents;
-                let addButton = <div className="size-of-button" />;
-                if (!visibleDivs.includes(i * 2)) {
-                    addButton = <button className="btn-split" onClick={() => onSplitClick(i)} >split</button>;
+            let elements = arrays[i].contents;
+
+            if (visibleDivs.includes(i)) {
+                if (divToMerge === i) {
+                    result.push(
+                        <div className="array-and-div">
+                            <div className="element-target" ref={drop} >
+                                {mergeArray.map((element) => {
+                                    return <Element contents={element.contents} id={element.id} style="ar-el" />
+                                })}
+                            </div>
+                            <button className="btn-merge" onClick={() => onMergeClick(i)} >merge</button>
+                        </div>
+                    );
                 }
-                if (visibleDivs.includes(i)) {
+                else {
                     result.push(
                         <div className="array-and-div">
                             <div className="array-split">
                                 {
                                     elements?.map((element) => {
                                         return <Element contents={element.contents} id={element.id} style={arrays[i].style} />
-                                    })
-                                }
+                                    })}
                             </div>
                             {determineButton(i)}
                         </div>
-
                     );
                 }
-                else {
-                    result.push(<div className="array-and-div" />);
-                }
             }
+            else {
+                result.push(<div className="array-and-div" />);
+            }
+            //if (arrays[i].contents !== undefined) {
+            //}
             
         }
         return (
@@ -409,22 +448,33 @@ function Merge() {
         const result = [];
         for (let i = 4; i < 8; i++) {
             let elements = arrays[i].contents;
-            let addButton = <div className="size-of-button" />;
-            if (!visibleDivs.includes(i * 2)) {
-                addButton = <button className="btn-split" onClick={() => onSplitClick(i)} >split</button>;
-            }
+
             if (visibleDivs.includes(i)) {
-                result.push(
-                    <div className="array-and-div">
-                        <div className="array-split" ref={drop}>
-                            {
-                                elements?.map((element) => {
-                                    return <Element contents={element.contents} id={element.id} style={arrays[i].style} />
+                if (divToMerge === i) {
+                    result.push(
+                        <div className="array-and-div">
+                            <div className="element-target" ref={drop} >
+                                {mergeArray.map((element) => {
+                                    return <Element contents={element.contents} id={element.id} style="ar-el" />
                                 })}
+                            </div>
+                            <button className="btn-merge" onClick={() => onMergeClick(i)} >merge</button>
                         </div>
-                        {determineButton(i)}
-                    </div>
-                );
+                    );
+                }
+                else {
+                    result.push(
+                        <div className="array-and-div">
+                            <div className="array-split">
+                                {
+                                    elements?.map((element) => {
+                                        return <Element contents={element.contents} id={element.id} style={arrays[i].style} />
+                                    })}
+                            </div>
+                            {determineButton(i)}
+                        </div>
+                    );
+                }
             }
             else {
                 result.push(<div className="array-and-div" />);
@@ -441,12 +491,7 @@ function Merge() {
         const result = [];
         for (let i = 8; i < 16; i++) {
             let elements = arrays[i].contents;
-            let addButton = <div className="size-of-button"/>;
-            if (elements.length > 1) {
-                if (!visibleDivs.includes(i * 2)) {
-                    addButton = <button className="btn-split" onClick={() => onSplitClick(i)} >split</button>;
-                }
-            }
+
             if (visibleDivs.includes(i)) {
                 if (divToMerge === i) {
                     result.push(
