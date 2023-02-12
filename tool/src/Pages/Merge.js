@@ -228,7 +228,7 @@ function Merge() {
             isOver: !!monitor.isOver(),
         }),
         droppedItems:[],
-    }))
+    }))//remove dropped items?
 
     useEffect(
         () => {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     BrowserRouter as Router,
     Routes,
@@ -10,83 +10,128 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
 import About from "./Pages/About";
+//import Menu from "./Pages/Menu";
 import Merge from "./Pages/Merge";
+import Heap from "./Pages/Heap";
 
-class Menu extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            madeAlgoChoice: false,
-            algoChoice: "none",
-            contentChoice: "none",
-            redirect: null
-        };
+const Algorithm = Object.freeze({
+    None: Symbol("none"),
+    Merge: Symbol("merge"),
+    Heap: Symbol("heap")
+})
+
+const ContentType = Object.freeze({
+    None: Symbol("none"),
+    Demo: Symbol("demo"),
+    Easy: Symbol("easy"),
+    Hard: Symbol("hard")
+})
+
+function Menu() {
+    const [algoChoice, setAlgoChoice] = useState(Algorithm.None);
+    const [contentChoice, setContentChoice] = useState(ContentType.None);
+    const [redirect, setRedirect] = useState(null);
+
+    const onMergeClick = () => {
+        //this.setState({ madeAlgoChoice: true, algoChoice: Algorithm.Merge }, () => { console.log(this.madeAlgoChoice) });
+        setAlgoChoice(Algorithm.Merge);
     }
 
-    onMergeClick() {
-        this.setState({ algoChoice: "merge", madeAlgoChoice: true });
+    const onHeapClick = () => {
+        //this.setState({ algoChoice: Algorithm.Heap, madeAlgoChoice: true }, () => { console.log(this.madeAlgoChoice) });
+        setAlgoChoice(Algorithm.Heap);
     }
 
-    onHeapClick() {
-        this.setState({ algoChoice: "heap", madeAlgoChoice: true });
-    }
-
-    onAboutClick() {
-        this.setState({ redirect: "/About" });
+    const onAboutClick = () => {
+        setRedirect({ redirect: "/About" });
 
     }
 
-    onDemoClick() {
-        this.setState({ contentChoice: "demo" });
+    const onDemoClick = () => {
+        setRedirect(ContentType.Demo);
 
     }
 
-    onEasyClick() {
-        this.setState({ contentChoice: "easy" });
-        this.setState({ redirect: "/Merge" });
-    }
-
-    onHardClick() {
-        this.setState({ contentChoice: "hard" });
-    }
-
-    render() {
-        if (this.state.redirect) {
-            return <Navigate to={this.state.redirect} />
+    const onEasyClick = () => {
+        setContentChoice(ContentType.Easy);
+        //console.log(this.algoChoice);
+        if (algoChoice === Algorithm.Merge) {
+            setRedirect("/Merge");
         }
-        if (!this.state.madeAlgoChoice) {
+        else if (algoChoice === Algorithm.Heap) {
+            setRedirect("/Heap");
+        }
+    }
+
+    const onHardClick = () => {
+        setContentChoice(ContentType.Hard);
+    }
+
+    const selection1 = () => {
+        console.log("Algo choice: " + algoChoice.toString());
+        if (algoChoice === Algorithm.None) {
             return (
                 <div>
-                    <button onClick={() => { this.onMergeClick() }} >{/*className="btn-primary"*/}
+                    <button onClick={() => { onMergeClick() }} >
                         Merge Sort
                     </button>
-                    <button onClick={() => { this.onHeapClick() }}>
+                    <button onClick={() => { onHeapClick() }}>
                         Heap Sort
                     </button>
-                    <button onClick={() => { this.onAboutClick() }}>
+                    <button onClick={() => { onAboutClick() }}>
                         About
                     </button>
 
                 </div>
             );
         }
-        if (this.state.madeAlgoChoice) {
+        return;
+    }
+
+    const selection2 = () => {
+        if (algoChoice !== Algorithm.None) {
             return (
                 <div>
-                    <button onClick={() => { this.onDemoClick() }} >
+                    <button onClick={() => { onDemoClick() }} >
                         Demo
                     </button>
-                    <button onClick={() => { this.onEasyClick() }}>
+                    <button onClick={() => { onEasyClick() }}>
                         Easy Practice
                     </button>
-                    <button onClick={() => { this.onHardClick() }}>
+                    <button onClick={() => { onHardClick() }}>
                         Hard Practice
                     </button>
 
                 </div>
             );
         }
+        else {
+            return;
+        }
     }
+
+    const redirectPage = () => {
+        let result = [];
+        if (redirect) {
+
+            result.push(<Navigate to={redirect} />);
+        }
+        return result;
+    }
+
+    //Do not forget brackets when calling functions in return!!!
+    return (
+        <>
+            <h1>Hello!</h1>
+            <div>
+                {redirectPage()}
+                {selection1()}
+                {selection2()}
+
+            </div>
+
+        </>
+    );
 }
 
 function App() {
@@ -98,6 +143,7 @@ function App() {
                   <Route exact path="/" element={<Menu/>} />
                   <Route exact path="/About" element={<About />} />
                   <Route exact path="/Merge" element={<Merge />} />
+                  <Route exact path="/Heap" element={<Heap />} />
                   {/*<Route path="*" element={<NoPage />} />*/}
               </Routes>
             </Router>
