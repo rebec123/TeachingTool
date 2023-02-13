@@ -1,5 +1,6 @@
 :root {
     --button-height: 30px;
+    --circle-height: 65px;
 }
 .App {
   text-align: center;
@@ -111,6 +112,7 @@
 .heap-div {
     border: 3px solid orange;
     width: 100%;
+    height: var(--circle-height);
     justify-content: center;
     align-items: center;
     display: flex;
@@ -134,13 +136,24 @@
 }
 
 .circle {
-    display:flex;
-    width: 65px;
-    height: 65px;
+    display: flex;
+    width: var(--circle-height);
+    height: var(--circle-height);
     border-radius: 50%;
     border: 3px solid black;
     justify-content: center;
-    vertical-align:middle;
+    vertical-align: middle;
+    font-size: 2em;
+}
+
+.circle-grey {
+    display: flex;
+    width: var(--circle-height);
+    height: var(--circle-height);
+    border-radius: 50%;
+    border: 3px solid grey;
+    justify-content: center;
+    vertical-align: middle;
     font-size: 2em;
 }
 
