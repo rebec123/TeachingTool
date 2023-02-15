@@ -125,8 +125,9 @@
 }
 
 .ar-el-bare {
-    font-size: 2em;
+    font-size: 35px;
     width: 50px;
+    background: transparent;
 }
 .ar-el-container {
     color: black;
@@ -143,7 +144,8 @@
     border: 3px solid black;
     justify-content: center;
     vertical-align: middle;
-    font-size: 2em;
+    font-size: 35px;
+    ;
 }
 
 .circle-grey {

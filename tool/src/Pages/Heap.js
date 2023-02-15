@@ -2,35 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useDrop, useDrag } from "react-dnd";
 //import Tree from 'react-d3-tree';
 
-/*const orgChart = {
-    name: '1',
-    children: [
-        {
-            name: '2',
-            children: [
-                {
-                    name: '4',
-                },
-                {
-                    name: '5',
-                },
-            ],
-        },
-        {
-            name: '3',
-            children: [
-                {
-                    name: '6',
-                },
-                {
-                    name: '7',
-                },
-            ]
-
-        },
-    ],
-};
-function TreeStruct({ datatata }) {
+//not usre we need this anymore
+/*function TreeStruct({ datatata }) {
     //ToDo: Translate needs to dynamically know size of div and translate to half of it (to centre tree)
     return (
         // `<Tree />` will fill width/height of its container; in this case `#treeWrapper`.
@@ -88,16 +61,42 @@ function Element({ id, contents }) {
             isDragging: !!monitor.isDragging(),
         })
     }))
-    return (<div className="ar-el-bare" ref={drag} style={{ "backgroundColor": isDragging ? "grey" : "white" }}>{contents}</div>);
+    //should item disappear while being dragged? i rekon so
+    return (<div className="ar-el-bare" ref={drag}>{contents}</div>);//style={{ "backgroundColor": isDragging ? "grey" : "none" }
 }
+
+//This is seperate function because it's allows us to have multiple active drop targets at once
+function DropTarget({ targetID, contents, handleDropFunct }) {
+    const [{ isOver }, drop] = useDrop(() => ({
+        accept: "single-element",
+        drop: (element) => dropElement(element.id, targetID),
+        collect: (monitor) => ({
+            isOver: !!monitor.isOver(),
+        }),
+    }))
+
+    const dropElement = (droppedID, targetID) => {
+        handleDropFunct(droppedID, targetID);
+        //setTipText("heyooooooo");
+
+    }
+    return (
+        <div className="circle" ref={drop}>
+            <Element contents={contents} id={targetID} />
+        </div>
+    )
+}
+
+//NTS index in tree is NOT equal to element id throughout, only at beginnign
 
 const treeSetUp = () => {
     let result = [];
     result.push({});
     for (let i = 1; i <= elementList.length; i++) {
         result.push({
-            index: i,
-            contents: ""
+            id: i,
+            contents: "",
+            ref: undefined
         });
     }
     return result;
@@ -111,7 +110,7 @@ function Heap() {
     const [tipText, setTipText] = useState("Click where you think the next element in the array should go");
     const [tree, setTree] = useState(treeSetUp());
     const [arIndex, setArIndex] = useState(0);//start at 1 or 0?
-    const [{ isOver }, drop] = useDrop(() => ({
+    /*const [{ isOver }, drop] = useDrop(() => ({
         accept: "single-element",
         drop: (element) => dropElement(element.id),
         collect: (monitor) => ({
@@ -121,8 +120,41 @@ function Heap() {
 
     const dropElement = (id) => {
         console.log("hi");
+        setTipText("heyooooooo");
 
+    }*/
+
+    function handleDrop(droppedID, targetID) {
+        //Swap tree nodes if its a valid swap (nodes are child and parent, childs contents are greater than parents)
+        console.log("dropped : " + droppedID + " target : " + targetID);
+        if (targetID === Math.floor(droppedID / 2) && tree[droppedID].contents > tree[targetID].contents) {
+            console.log("Valid af!");
+
+            //finding index of "dropped" element in tree
+            let indexOfDropped = tree.findIndex(el => el.id === droppedID);
+            console.log("Found dropped index " + indexOfDropped);
+            let swapNodeDropped = tree[indexOfDropped];
+
+            //finding index of "target" element in tree
+            let indexOfTarget = tree.findIndex(el => el.id === targetID);
+            console.log("Found target index " + indexOfTarget);
+            let swapNodeTarget = tree[indexOfTarget];
+
+            //Swapping the elements in tree
+            let newTree = tree;
+            newTree[indexOfDropped] = swapNodeTarget;
+            newTree[indexOfTarget] = swapNodeDropped;
+            setTree(newTree);
+            setTipText("You swapped " + tree[indexOfTarget].contents + " and " + tree[indexOfDropped].contents);//We need to change something in this Heap component so page refreshes and we see reult of swappign nodes
+
+            //add code here to check if the result of that swap means we need to do another swap! don't let user continue until root is largest element
+            needToReorder(indexOfTarget)//was index of target but they've swapped now
+        }
+        else {
+            console.log(tree);
+        }
     }
+    
 
     const array = () => {
         //shouldn't be element list! just temporary. If numbers aren't in array (been removed) should still maintain each posiition so we see empty array properly
@@ -170,8 +202,22 @@ function Heap() {
         );
     }
 
-    const needToReorder = () => {
-
+    //Return true if the tree needs rearranging, false if not
+    const needToReorder = (i) => {
+        if (i === 1) {
+            return false;//Only one node in tree so no need to reorder
+        } //can i get out of bounds below?? check if this code needs error checking 
+        else if (tree[i].contents > tree[Math.floor(i / 2)].contents) {
+            let oldTree = tree;
+            //add logic here to initiate swap stuff??? careful of infinite loops from set state
+            //node parent = target, child = draggable. Do we need to add bool properties to state tree (draggable and target)
+            setTipText("Looks like you need to switch nodes to hold the property: \n'A child node cannot be larger than a parent node'");
+            
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     const onNodeClick = (i) => {
@@ -179,14 +225,20 @@ function Heap() {
         if (i-1 === arIndex) {
             let newContents = elementList[arIndex].contents;
             let oldTree = tree;
-            setTree(oldTree.map(
-                el => (el.index === i ? Object.assign(el, { contents: newContents }) : el)
-            ));
+            tree.findIndex((el) => (el.index))
+            let newTree = tree;
+            newTree[i].contents = newContents;//using position in array since we're just filling out tree
+            setTree(newTree);
+            /*setTree(oldTree.map(
+                el => (el.id === i ? Object.assign(el, { contents: newContents }) : el)
+            ));*/
             setArIndex(arIndex + 1);
             setTipText("Click where you think the next element in the array should go");
             //Need to check that the child is less than parent (so it's a valid max heap);
-            if (needToReorder()) {
+            //console.log(tree);
+            if (needToReorder(i)) {//dont forget to pass this method args you numpty!
                 //reorder time!
+                
             }
         }
         else {
@@ -202,8 +254,12 @@ function Heap() {
             return result;
         }
         //If node has contents, display
+        //NOT TO SELF, IS INDEX CORRECT HERE? COULD CAUSE WEIRD ERRORS SO KEEP LOOK OUT
+        //console.log("tree ref: " + tree[i].ref);
         if (tree[i].contents) {
-            result.push(<div className="circle"> {tree[i].contents} </div>)
+            result.push(
+                <DropTarget contents={tree[i].contents} targetID={tree[i].id} handleDropFunct={handleDrop} />//dropRef={drop}
+            )
         }
         //If 1 has no content, we want to display it as a button (can't lump it in with children like below because root has no children)
         else if (i === 1) {
@@ -220,23 +276,22 @@ function Heap() {
 
     const displayHeap = () => {
         let result = [];
-        let i = 1;
         //console.log(tree);
         result.push(
-            <div className="heap-div" ref={drop}>
-                {nodeDisplay(i)}
+            <div className="heap-div">
+                {nodeDisplay(1)}
             </div>
 
         );
 
         result.push(
             <>
-                <div className="heap-div" ref={drop}>
+                <div className="heap-div">
                     <div className="heap-div">{nodeDisplay(2)}</div>
                     <div className="heap-div">{nodeDisplay(3)}</div>
                 </div>
 
-                <div className="heap-div" ref={drop}>
+                <div className="heap-div">
                     <div className="heap-div">{nodeDisplay(4)}</div>
                     <div className="heap-div">{nodeDisplay(5)}</div>
                     <div className="heap-div">{nodeDisplay(6)}</div>
@@ -244,30 +299,6 @@ function Heap() {
                 </div>
             </>
         )
-        /*if (tree[id].contents) {
-            return (
-                <>
-                    <div className="heap-div" ref={drop}>
-                        <div className="circle"> {tree[id].contents} </div>
-                    </div>
-                    <div className="heap-div" ref={drop}>
-                        <div className="heap-div">
-                            <button className="circle-grey" onClick={() => onNodeClick(2)}></button>
-                        </div>
-                        <div className="heap-div">
-                            <button className="circle-grey" onClick={() => onNodeClick(3)}></button>
-                        </div>
-                    </div>
-                </>
-            );
-        }
-        else {
-            return (
-                <div className="heap-div" ref={drop}>
-                    <button className="circle-grey" onClick={() => onNodeClick(id)}></button>
-                </div>
-            );
-        }*/
         return result;
         
     }
