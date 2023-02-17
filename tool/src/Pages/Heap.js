@@ -130,12 +130,6 @@ function Heap() {
             let swapNodeDropped = tree[indexOfDropped];
             let swapNodeTarget = tree[indexOfTarget];
 
-            //Swapping the elements in tree
-            /*let oldDrop = tree.indexOf(el => el.ref == drop);
-            console.log(oldDrop);
-            if (oldDrop > 0) {
-                newTree[oldDrop].ref = undefined;
-            }*/
             let newTree = tree;
             newTree[indexOfDropped] = swapNodeTarget;
             newTree[indexOfDropped].ref = undefined;
@@ -143,7 +137,7 @@ function Heap() {
             setTree(newTree);
             console.log(tree);
             console.log(indexOfTarget);
-            setTipText("You swapped " + tree[indexOfTarget].contents + " and " + tree[indexOfDropped].contents);//We need to change something in this Heap component so page refreshes and we see reult of swappign nodes
+            //setTipText("You swapped " + tree[indexOfTarget].contents + " and " + tree[indexOfDropped].contents);//We need to change something in this Heap component so page refreshes and we see reult of swappign nodes
             needToReorder(indexOfTarget)//was index of dropped but they've swapped now
         }
         else {
@@ -199,10 +193,22 @@ function Heap() {
         );
     }
 
+    //In mathematical terms, a "complete" max-heap means that no child node is greater than its parent.
+    //It doesn't necessarily mean that it is "complete" as in all array elements are now in the tree
+    const isTreeComplete = () => {
+        console.log("arr index " + arIndex);
+        for (let i = 2; i <= arIndex; i++) {
+            if (tree[i].contents > tree[Math.floor(i / 2)].contents) {
+                return false;
+            }
+        }
+        return true;
+    }
     //Return true if the tree needs rearranging, false if not
     const needToReorder = (index) => {
         console.log(tree);
         if (index === 1) {
+            setTipText("Click stuff innit");
             return false;//Only one node in tree so no need to reorder
         } //can i get out of bounds below?? check if this code needs error checking 
         else if (tree[index].contents > tree[Math.floor(index / 2)].contents) {
@@ -214,13 +220,16 @@ function Heap() {
             return true;
         }
         else {
+            setTipText("Click stuff innit");//tell them to click where next thing should go unless array all in tree now, then tell them to delete a node?
             return false;
         }
     }
 
     const onNodeClick = (index) => {
         //checking the user filled in the correct node (binary tree needs to be "complete" for heapsort algorithm)
-        if (index-1 === arIndex) {
+        let treeComplete = isTreeComplete();
+        console.log(treeComplete);
+        if (index - 1 === arIndex && treeComplete) {//AND if nothing else in tree needs shifting?
             let newContents = elementList[arIndex].contents;
             let oldTree = tree;
             tree.findIndex((el) => (el.index))
@@ -236,8 +245,8 @@ function Heap() {
             //console.log(tree);
             if (needToReorder(index)) {//dont forget to pass this method args you numpty!
                 //reorder time!
-                
             }
+            
         }
         else {
             setTipText("That's not the next position, try again.");
@@ -246,59 +255,85 @@ function Heap() {
     //Weird: grey looks smaller than black cirlce
     const nodeDisplay = (i) => {
         let result = [];
-        if (i > elementList.length) {
-            //setArIndex(0);//cant set here- infinite re renders :( - but do need to set somewhere!
-            //set screen to deletetion mode or somthing! (all inserts are finished, time to delete)
-            return result;
-        }
-        //If node has contents, display
-        //NOT TO SELF, IS INDEX CORRECT HERE? COULD CAUSE WEIRD ERRORS SO KEEP LOOK OUT
-        //console.log("tree ref: " + tree[i].ref);
-        if (tree[i].contents) {
-            result.push(
-                <div className="circle" ref={tree[i].ref}>
-                <Element contents={tree[i].contents} id={tree[i].id} />
-                </div>
-            )
-        }
-        //If 1 has no content, we want to display it as a button (can't lump it in with children like below because root has no children)
-        else if (i === 1) {
-            result.push(<button className="circle-grey" onClick={() => onNodeClick(i)}></button>)
-        }
-        //If the node's parent is showing, display node as grey button
-        else if (i / 2 >= 1) {
-            if (tree[Math.floor(i / 2)].contents) {
+        /*if (arIndex === elementList.length && isTreeComplete()) {
+            //deletion mode (getting ordered array)
+            console.log("deletion time");
+            if (i === 1) {
+                result.push(
+                <button className="circle" onClick={() => onNodeClick(i)}>
+                    <Element contents={tree[i].contents} id={tree[i].id} />
+                </button>)
+            }
+            else {//this is wrong! just temp for testing!!
+                result.push(
+                    <div className="circle" ref={tree[i].ref}>
+                        <Element contents={tree[i].contents} id={tree[i].id} />
+                    </div>
+                )
+            }
+        }*/
+        if (false) { }//got here^^ figure out deletion mode
+        else {
+            if (i > elementList.length) {
+                //setArIndex(0);//cant set here- infinite re renders :( - but do need to set somewhere!
+                //set screen to deletetion mode or somthing! (all inserts are finished, time to delete)
+                return result;
+            }
+            //If node has contents, display
+            //NOT TO SELF, IS INDEX CORRECT HERE? COULD CAUSE WEIRD ERRORS SO KEEP LOOK OUT
+            //console.log("tree ref: " + tree[i].ref);
+            if (tree[i].contents) {
+                result.push(
+                    <div className="circle" ref={tree[i].ref}>
+                        <Element contents={tree[i].contents} id={tree[i].id} />
+                    </div>
+                )
+            }
+            //If 1 has no content, we want to display it as a button (can't lump it in with children like below because root has no children)
+            else if (i === 1) {
                 result.push(<button className="circle-grey" onClick={() => onNodeClick(i)}></button>)
             }
+            //If the node's parent is showing, display node as grey button
+            else if (i / 2 >= 1) {
+                if (tree[Math.floor(i / 2)].contents) {
+                    result.push(<button className="circle-grey" onClick={() => onNodeClick(i)}></button>)
+                }
+            }
         }
+        
         return (result); 
     }
 
-    const displayHeap = () => {
+    const displayHeap = () => {//need way to determine nodes in deletion mode 
+        //root should be a button (to delete node an dadd to main array), then should be able to drag latest elemnt to root and shift stuff
         let result = [];
-        //console.log(tree);
-        result.push(
-            <div className="heap-div">
-                {nodeDisplay(1)}
-            </div>
 
-        );
-
-        result.push(
-            <>
+        
+            //insertion mode
+            result.push(
                 <div className="heap-div">
-                    <div className="heap-div">{nodeDisplay(2)}</div>
-                    <div className="heap-div">{nodeDisplay(3)}</div>
+                    {nodeDisplay(1)}
                 </div>
 
-                <div className="heap-div">
-                    <div className="heap-div">{nodeDisplay(4)}</div>
-                    <div className="heap-div">{nodeDisplay(5)}</div>
-                    <div className="heap-div">{nodeDisplay(6)}</div>
-                    <div className="heap-div">{nodeDisplay(7)}</div>
-                </div>
-            </>
-        )
+            );
+
+            result.push(
+                <>
+                    <div className="heap-div">
+                        <div className="heap-div">{nodeDisplay(2)}</div>
+                        <div className="heap-div">{nodeDisplay(3)}</div>
+                    </div>
+
+                    <div className="heap-div">
+                        <div className="heap-div">{nodeDisplay(4)}</div>
+                        <div className="heap-div">{nodeDisplay(5)}</div>
+                        <div className="heap-div">{nodeDisplay(6)}</div>
+                        <div className="heap-div">{nodeDisplay(7)}</div>
+                    </div>
+                </>
+            )
+        
+        
         return result;
         
     }
