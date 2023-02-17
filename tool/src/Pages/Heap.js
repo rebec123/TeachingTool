@@ -119,17 +119,10 @@ function Heap() {
         }),
     }))
 
-    const dropElement = (droppedID) => {
-        let targetID = tree.findIndex(el => el.ref === drop);
-        ///console.log("drop target " + targetID);
-        //let targetID = dropTarget;//temp
-        //Swap tree nodes if its a valid swap (nodes are child and parent, childs contents are greater than parents)
-        console.log("dropped : " + droppedID + " target : " + targetID);
-
-        let indexOfDropped = tree.findIndex((el, index) => index === droppedID);
-        let indexOfTarget = tree.findIndex((el, index) => index === targetID);
-        console.log("Found dropped index " + indexOfDropped);
-        console.log("Found target index " + indexOfTarget);
+    const dropElement = (indexOfDropped) => {
+        let indexOfTarget = tree.findIndex(el => el.ref === drop);
+        
+        console.log("dropped : " + indexOfDropped + " target : " + indexOfTarget);
 
         if (indexOfTarget === Math.floor(indexOfDropped / 2) && tree[indexOfDropped].contents > tree[indexOfTarget].contents) {
             console.log("Valid af!");
@@ -207,23 +200,17 @@ function Heap() {
     }
 
     //Return true if the tree needs rearranging, false if not
-    const needToReorder = (i) => {
+    const needToReorder = (index) => {
         console.log(tree);
-        if (i === 1) {
+        if (index === 1) {
             return false;//Only one node in tree so no need to reorder
         } //can i get out of bounds below?? check if this code needs error checking 
-        else if (tree[i].contents > tree[Math.floor(i / 2)].contents) {
+        else if (tree[index].contents > tree[Math.floor(index / 2)].contents) {
             setTipText("Looks like you need to switch nodes to hold the property: \n'A child node cannot be larger than a parent node'");
             let newTree = tree;
-            newTree[Math.floor(i / 2)].ref = drop;
+            newTree[Math.floor(index / 2)].ref = drop;
             setTree(newTree);
             console.log(newTree);
-            //setDropTarget(Math.floor(i / 2));
-            //console.log(dropTarget);
-            /*setTree(oldTree.map(
-                el => ((el.index === parent) ? Object.assign(el, { contents: newContents }) : el)
-            ));*/
-            
             return true;
         }
         else {
@@ -231,14 +218,14 @@ function Heap() {
         }
     }
 
-    const onNodeClick = (i) => {
+    const onNodeClick = (index) => {
         //checking the user filled in the correct node (binary tree needs to be "complete" for heapsort algorithm)
-        if (i-1 === arIndex) {
+        if (index-1 === arIndex) {
             let newContents = elementList[arIndex].contents;
             let oldTree = tree;
             tree.findIndex((el) => (el.index))
             let newTree = tree;
-            newTree[i].contents = newContents;//using position in array since we're just filling out tree
+            newTree[index].contents = newContents;//using position in array since we're just filling out tree
             setTree(newTree);
             /*setTree(oldTree.map(
                 el => (el.id === i ? Object.assign(el, { contents: newContents }) : el)
@@ -247,7 +234,7 @@ function Heap() {
             setTipText("Click where you think the next element in the array should go");
             //Need to check that the child is less than parent (so it's a valid max heap);
             //console.log(tree);
-            if (needToReorder(i)) {//dont forget to pass this method args you numpty!
+            if (needToReorder(index)) {//dont forget to pass this method args you numpty!
                 //reorder time!
                 
             }
