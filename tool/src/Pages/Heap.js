@@ -66,7 +66,7 @@ function Element({ id, contents }) {
 }
 
 //This is seperate function because it's allows us to have multiple active drop targets at once
-function DropTarget({ targetID, contents, handleDropFunct }) {
+/*function DropTarget({ targetID, contents, handleDropFunct }) {
     const [{ isOver }, drop] = useDrop(() => ({
         accept: "single-element",
         drop: (element) => dropElement(element.id, targetID),
@@ -85,7 +85,7 @@ function DropTarget({ targetID, contents, handleDropFunct }) {
             <Element contents={contents} id={targetID} />
         </div>
     )
-}
+}*/
 
 //NTS index in tree is NOT equal to element id throughout, only at beginnign
 
@@ -110,7 +110,8 @@ function Heap() {
     const [tipText, setTipText] = useState("Click where you think the next element in the array should go");
     const [tree, setTree] = useState(treeSetUp());
     const [arIndex, setArIndex] = useState(0);//start at 1 or 0?
-    /*const [{ isOver }, drop] = useDrop(() => ({
+    const [dropTarget, setDropTarget] = useState(0);
+    const [{ isOver }, drop] = useDrop(() => ({
         accept: "single-element",
         drop: (element) => dropElement(element.id),
         collect: (monitor) => ({
@@ -118,41 +119,44 @@ function Heap() {
         }),
     }))
 
-    const dropElement = (id) => {
-        console.log("hi");
-        setTipText("heyooooooo");
-
-    }*/
-
-    function handleDrop(droppedID, targetID) {
+    const dropElement = (droppedID) => {
+        let targetID = tree.findIndex(el => el.ref === drop);
+        ///console.log("drop target " + targetID);
+        //let targetID = dropTarget;//temp
         //Swap tree nodes if its a valid swap (nodes are child and parent, childs contents are greater than parents)
         console.log("dropped : " + droppedID + " target : " + targetID);
-        if (targetID === Math.floor(droppedID / 2) && tree[droppedID].contents > tree[targetID].contents) {
+
+        let indexOfDropped = tree.findIndex((el, index) => index === droppedID);
+        let indexOfTarget = tree.findIndex((el, index) => index === targetID);
+        console.log("Found dropped index " + indexOfDropped);
+        console.log("Found target index " + indexOfTarget);
+
+        if (indexOfTarget === Math.floor(indexOfDropped / 2) && tree[indexOfDropped].contents > tree[indexOfTarget].contents) {
             console.log("Valid af!");
 
-            //finding index of "dropped" element in tree
-            let indexOfDropped = tree.findIndex(el => el.id === droppedID);
-            console.log("Found dropped index " + indexOfDropped);
             let swapNodeDropped = tree[indexOfDropped];
-
-            //finding index of "target" element in tree
-            let indexOfTarget = tree.findIndex(el => el.id === targetID);
-            console.log("Found target index " + indexOfTarget);
             let swapNodeTarget = tree[indexOfTarget];
 
             //Swapping the elements in tree
+            /*let oldDrop = tree.indexOf(el => el.ref == drop);
+            console.log(oldDrop);
+            if (oldDrop > 0) {
+                newTree[oldDrop].ref = undefined;
+            }*/
             let newTree = tree;
             newTree[indexOfDropped] = swapNodeTarget;
+            newTree[indexOfDropped].ref = undefined;
             newTree[indexOfTarget] = swapNodeDropped;
             setTree(newTree);
+            console.log(tree);
+            console.log(indexOfTarget);
             setTipText("You swapped " + tree[indexOfTarget].contents + " and " + tree[indexOfDropped].contents);//We need to change something in this Heap component so page refreshes and we see reult of swappign nodes
-
-            //add code here to check if the result of that swap means we need to do another swap! don't let user continue until root is largest element
-            needToReorder(indexOfTarget)//was index of target but they've swapped now
+            needToReorder(indexOfTarget)//was index of dropped but they've swapped now
         }
         else {
-            console.log(tree);
+            console.log("not valid");
         }
+
     }
     
 
@@ -204,14 +208,21 @@ function Heap() {
 
     //Return true if the tree needs rearranging, false if not
     const needToReorder = (i) => {
+        console.log(tree);
         if (i === 1) {
             return false;//Only one node in tree so no need to reorder
         } //can i get out of bounds below?? check if this code needs error checking 
         else if (tree[i].contents > tree[Math.floor(i / 2)].contents) {
-            let oldTree = tree;
-            //add logic here to initiate swap stuff??? careful of infinite loops from set state
-            //node parent = target, child = draggable. Do we need to add bool properties to state tree (draggable and target)
             setTipText("Looks like you need to switch nodes to hold the property: \n'A child node cannot be larger than a parent node'");
+            let newTree = tree;
+            newTree[Math.floor(i / 2)].ref = drop;
+            setTree(newTree);
+            console.log(newTree);
+            //setDropTarget(Math.floor(i / 2));
+            //console.log(dropTarget);
+            /*setTree(oldTree.map(
+                el => ((el.index === parent) ? Object.assign(el, { contents: newContents }) : el)
+            ));*/
             
             return true;
         }
@@ -258,7 +269,9 @@ function Heap() {
         //console.log("tree ref: " + tree[i].ref);
         if (tree[i].contents) {
             result.push(
-                <DropTarget contents={tree[i].contents} targetID={tree[i].id} handleDropFunct={handleDrop} />//dropRef={drop}
+                <div className="circle" ref={tree[i].ref}>
+                <Element contents={tree[i].contents} id={tree[i].id} />
+                </div>
             )
         }
         //If 1 has no content, we want to display it as a button (can't lump it in with children like below because root has no children)
