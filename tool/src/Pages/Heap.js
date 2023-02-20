@@ -149,6 +149,7 @@ function Heap() {
     const [tree, setTree] = useState(treeSetUp());
     const [topArray, setTopArray] = useState([,]);//Code doesn't like this w/o comma
     const [arIndex, setArIndex] = useState(0);//start at 1 or 0?
+    const [mode, setMode] = useState("deletion")//temp!!!Change to start as insertion after we've finished coding deletion
     const [dropTarget, setDropTarget] = useState(0);
     const [{ isOver }, drop] = useDrop(() => ({
         accept: "single-element",
@@ -163,7 +164,7 @@ function Heap() {
 
         console.log("dropped : " + indexOfDropped + " target : " + indexOfTarget);
         //insertion mode
-        if (arIndex === elementList.length) {
+        if (mode === "insertion") {
             if (indexOfTarget === Math.floor(indexOfDropped / 2) && tree[indexOfDropped].contents > tree[indexOfTarget].contents) {
                 console.log("Valid af!");
 
@@ -184,13 +185,73 @@ function Heap() {
                 console.log("not valid");
             }
         }
-        else {//deletion mode
-            if (tree[1].contents === " " && indexOfDropped === elementList.length - 1) {
+        else if (mode === "deletion") {//deletion mode
+            //NTS: big yikes, not index but id now, what is happening? it gave index in insertion mode!
+            //target index still correct cos it just looks for chichever element has drop ref and retuns that index :)
+            let droppedIndex = tree.findIndex(el => el.id === indexOfDropped);
+
+            console.log(tree);
+            console.log(droppedIndex);
+            if (tree[1].contents === " " && droppedIndex === elementList.length) {
                 console.log("valid deletion mode drop");
+                let newTree = tree;
+                let newRoot = tree[droppedIndex];
+                newRoot.ref = drop;
+                newTree[1] = newRoot;
+                if (newRoot.contents < tree[2].contents || newRoot.contents < tree[3].contents) {
+                    setTipText("That's correct! Now the root needs sifting down the heap to maintiain the following property: " +
+                        "'A child node cannot be larger than a parent node'" +
+                        "\n Drag the largest child of the root to replace " + tree[1].contents);
+                }
+                else {
+                    setTipText("That's correct! Also, the new root is not smaller than either of its children so the heap does not need sifting");
+                }
+                newTree.pop();
+                setTree(newTree);
+                //delete last node from heap
+                //make left/right child a drop?
             }
-            else {
-                console.log("wut");
+            else if (tree[1].contents) {//We're sifitng root down
+                if (indexOfTarget === Math.floor(droppedIndex / 2)) {
+                    //if that was the biggest child, then swap. otherwise tell user that they have to choose biggest child
+                    //if dropped index odd, its a left child otherwise its right
+                    let sibling = droppedIndex + 1;
+                    if (droppedIndex % 2 !== 0) {
+                        sibling = droppedIndex - 1;
+                    }
+                    console.log(tree.length);
+                    //If node has a sibling...
+                    if (sibling < tree.length) {
+                        //and sibling's contents are greater than the node the user dragged, we need to correct them
+                        if (tree[sibling].contents > tree[droppedIndex].contents) {
+                            setTipText("That isn't the correct node, try again.");
+                            return;
+                        }
+
+                    }
+                    //User chose the correct node to swap
+                    console.log("yas hunty");
+
+                    let swapNodeDropped = tree[droppedIndex];
+                    let swapNodeTarget = tree[indexOfTarget];
+
+                    let newTree = tree;
+                    newTree[droppedIndex] = swapNodeTarget;
+                    newTree[droppedIndex].ref = undefined;
+                    newTree[indexOfTarget] = swapNodeDropped;
+                    setTree(newTree);
+                    setTipText("Yaaas.");
+                }
+                else {
+                    setTipText("That's not a child of the node you're trying to swap. Try again.")
+                    //ToDo: Seems to give this even when not true, fix!
+
+                    //Also! make sure user can keep deleting and sifting till the end, broken atm 
+                }
             }
+        }
+        else {
+            console.log("whoopsie");//ToDo: be more profesh
         }
         
 
@@ -268,6 +329,7 @@ function Heap() {
 
     //In mathematical terms, a "complete" max-heap means that no child node is greater than its parent.
     //It doesn't necessarily mean that it is "complete" as in all array elements are now in the tree
+    //Todo: rename to say it checks all parents are bigegr than children! not technically chekcing if complete cos spots might be missing in deletion
     const isTreeComplete = () => {
         //console.log("arr index " + arIndex);
         for (let i = 2; i <= arIndex; i++) {
@@ -314,7 +376,8 @@ function Heap() {
             ));*/
             setArIndex(arIndex + 1);
             //Is this right?????
-            if (arIndex === elementList.length && isTreeComplete()) {
+            if (arIndex === tree.length && isTreeComplete()) {
+                setMode("deletion");
                 setTipText("Click the node that should be deleted from the heap and added to the new ordered array");
             }
             else {
@@ -361,22 +424,20 @@ function Heap() {
     //Weird: grey looks smaller than black cirlce
     const nodeDisplay = (i) => {
         let result = [];
-        if (i > elementList.length) {//out of bounds
+        if (i > tree.length-1) {//out of bounds
             return result;
         }
-        //temp!!!!!!!!! replace 6 with arIndex
         //Tree is ordered and its time to delete root
-        if (6 === elementList.length && isTreeComplete()) {
+        if (mode === "deletion" && isTreeComplete()) {
             //deletion mode (getting ordered array)
-            //console.log(tree);//delete root then drag node that should take its place? then drag around
+            //console.log(tree[i].ref);//delete root then drag node that should take its place? then drag around
             result.push(
                 <button className="circle" onClick={() => onNodeClickD(i)} ref={tree[i].ref }>
                     <Element contents={tree[i].contents} id={tree[i].id} />
                 </button>)
         }
         //We're in deletion phase but the heap needs reordering
-        //temp!!!!!!!!! replace 6 with arIndex
-        else if (6 === elementList.length) {
+        else if (mode === "deletion") {
             result.push(
                 <div className="circle" ref={tree[i].ref} >
                     <Element contents={tree[i].contents} id={tree[i].id} />
@@ -386,7 +447,7 @@ function Heap() {
         //Still filling up heap
         else {
             //If node has contents, display
-            //NOT TO SELF, IS INDEX CORRECT HERE? COULD CAUSE WEIRD ERRORS SO KEEP LOOK OUT
+            //NTS, IS INDEX CORRECT HERE? COULD CAUSE WEIRD ERRORS SO KEEP LOOK OUT
             //console.log("tree ref: " + tree[i].ref);
             if (tree[i].contents) {
                 result.push(
