@@ -20,6 +20,8 @@ import { useDrop, useDrag } from "react-dnd";
     );
 }*/
 
+//When user needs to switch node position, that should be text tip until they've done it
+
 const elementList = [
     {
         id: 1,
@@ -91,13 +93,49 @@ function Element({ id, contents }) {
 
 const treeSetUp = () => {
     let result = [];
-    result.push({});
-    for (let i = 1; i <= elementList.length; i++) {
+    if (true) {//Temp!!!!: testing mode for deletion
+        result.push({});
         result.push({
-            id: i,
-            contents: "",
+            id: 5,
+            contents: 8,
             ref: undefined
         });
+        result.push({
+            id: 1,
+            contents: 6,
+            ref: undefined
+        });
+        result.push({
+            id: 6,
+            contents: 7,
+            ref: undefined
+        });
+        result.push({
+            id: 4,
+            contents: 1,
+            ref: undefined
+        });
+        result.push({
+            id: 2,
+            contents: 5,
+            ref: undefined
+        });
+        result.push({
+            id: 3,
+            contents: 3,
+            ref: undefined
+        });
+
+    }
+    else {
+        result.push({});
+        for (let i = 1; i <= elementList.length; i++) {
+            result.push({
+                id: i,
+                contents: "",
+                ref: undefined
+            });
+        }
     }
     return result;
 }
@@ -109,6 +147,7 @@ const treeSetUp = () => {
 function Heap() {
     const [tipText, setTipText] = useState("Click where you think the next element in the array should go");
     const [tree, setTree] = useState(treeSetUp());
+    const [topArray, setTopArray] = useState([,]);//Code doesn't like this w/o comma
     const [arIndex, setArIndex] = useState(0);//start at 1 or 0?
     const [dropTarget, setDropTarget] = useState(0);
     const [{ isOver }, drop] = useDrop(() => ({
@@ -121,55 +160,89 @@ function Heap() {
 
     const dropElement = (indexOfDropped) => {
         let indexOfTarget = tree.findIndex(el => el.ref === drop);
-        
+
         console.log("dropped : " + indexOfDropped + " target : " + indexOfTarget);
+        //insertion mode
+        if (arIndex === elementList.length) {
+            if (indexOfTarget === Math.floor(indexOfDropped / 2) && tree[indexOfDropped].contents > tree[indexOfTarget].contents) {
+                console.log("Valid af!");
 
-        if (indexOfTarget === Math.floor(indexOfDropped / 2) && tree[indexOfDropped].contents > tree[indexOfTarget].contents) {
-            console.log("Valid af!");
+                let swapNodeDropped = tree[indexOfDropped];
+                let swapNodeTarget = tree[indexOfTarget];
 
-            let swapNodeDropped = tree[indexOfDropped];
-            let swapNodeTarget = tree[indexOfTarget];
-
-            let newTree = tree;
-            newTree[indexOfDropped] = swapNodeTarget;
-            newTree[indexOfDropped].ref = undefined;
-            newTree[indexOfTarget] = swapNodeDropped;
-            setTree(newTree);
-            console.log(tree);
-            console.log(indexOfTarget);
-            //setTipText("You swapped " + tree[indexOfTarget].contents + " and " + tree[indexOfDropped].contents);//We need to change something in this Heap component so page refreshes and we see reult of swappign nodes
-            needToReorder(indexOfTarget)//was index of dropped but they've swapped now
+                let newTree = tree;
+                newTree[indexOfDropped] = swapNodeTarget;
+                newTree[indexOfDropped].ref = undefined;
+                newTree[indexOfTarget] = swapNodeDropped;
+                setTree(newTree);
+                console.log(tree);
+                console.log(indexOfTarget);
+                //setTipText("You swapped " + tree[indexOfTarget].contents + " and " + tree[indexOfDropped].contents);//We need to change something in this Heap component so page refreshes and we see reult of swappign nodes
+                needToReorder(indexOfTarget)//was index of dropped but they've swapped now
+            }
+            else {
+                console.log("not valid");
+            }
         }
-        else {
-            console.log("not valid");
+        else {//deletion mode
+            if (tree[1].contents === " " && indexOfDropped === elementList.length - 1) {
+                console.log("valid deletion mode drop");
+            }
+            else {
+                console.log("wut");
+            }
         }
+        
 
     }
     
 
     const array = () => {
-        //shouldn't be element list! just temporary. If numbers aren't in array (been removed) should still maintain each posiition so we see empty array properly
-        //need to make ar-el-container a drag target during deletion process?? Or should user just becale to click the node they want to delete?
         const result = [];
-        //console.log(elementList);
-        result.push(
-            <>
-                <div className="array-heap">
-                {
-                    elementList.map(element => {
-                        return (
-                            <div className="ar-el-container">
-                                <Element contents={element.contents} id={element.id} />
-                            </div>
-                        )
-                    })
-                }
-                </div>
-            </>
-        );
+        if (true) {//temp!!!!! change so there's a state that maintains what should appear in this array
+            topArray.map(element => {
+                result.push(
+                    <div className="ar-el-container">
+                        <Element contents={element.contents} id={element.id} />
+                    </div>
+                )
+            });
+            let blanksLeft = elementList.length - (topArray.length - 1);
+            //console.log(blanksLeft);
+            for (let i = 0; i < blanksLeft; i++) {
+                //console.log("i: "+i);
+                result.push(
+                    <div className="ar-el-container">
+                        <Element contents=" " id="" />
+                    </div>
+                )
+            }
+        }
+        else {
+
+            //shouldn't be element list! just temporary. If numbers aren't in array (been removed) should still maintain each posiition so we see empty array properly
+            //need to make ar-el-container a drag target during deletion process?? Or should user just becale to click the node they want to delete?
+            //console.log(elementList);
+            result.push(
+                <>
+                    {
+                        elementList.map(element => {
+                            return (
+                                <div className="ar-el-container">
+                                    <Element contents={element.contents} id={element.id} />
+                                </div>
+                            )
+                        })
+                    }
+                </>
+            );
+
+        } 
 
         return (
-            result
+            <div className="array-heap">
+                {result}
+            </div>
         );
     }
 
@@ -196,7 +269,7 @@ function Heap() {
     //In mathematical terms, a "complete" max-heap means that no child node is greater than its parent.
     //It doesn't necessarily mean that it is "complete" as in all array elements are now in the tree
     const isTreeComplete = () => {
-        console.log("arr index " + arIndex);
+        //console.log("arr index " + arIndex);
         for (let i = 2; i <= arIndex; i++) {
             if (tree[i].contents > tree[Math.floor(i / 2)].contents) {
                 return false;
@@ -224,12 +297,12 @@ function Heap() {
             return false;
         }
     }
-
-    const onNodeClick = (index) => {
+    //"I" for insertion phase
+    const onNodeClickI = (index) => {
         //checking the user filled in the correct node (binary tree needs to be "complete" for heapsort algorithm)
         let treeComplete = isTreeComplete();
         console.log(treeComplete);
-        if (index - 1 === arIndex && treeComplete) {//AND if nothing else in tree needs shifting?
+        if (index - 1 === arIndex && treeComplete) {
             let newContents = elementList[arIndex].contents;
             let oldTree = tree;
             tree.findIndex((el) => (el.index))
@@ -240,7 +313,13 @@ function Heap() {
                 el => (el.id === i ? Object.assign(el, { contents: newContents }) : el)
             ));*/
             setArIndex(arIndex + 1);
-            setTipText("Click where you think the next element in the array should go");
+            //Is this right?????
+            if (arIndex === elementList.length && isTreeComplete()) {
+                setTipText("Click the node that should be deleted from the heap and added to the new ordered array");
+            }
+            else {
+                setTipText("Click where you think the next element in the array should go");
+            }
             //Need to check that the child is less than parent (so it's a valid max heap);
             //console.log(tree);
             if (needToReorder(index)) {//dont forget to pass this method args you numpty!
@@ -252,33 +331,60 @@ function Heap() {
             setTipText("That's not the next position, try again.");
         }
     }
+
+    //NTS: if page isnt rerendering immediatile, slice(); is a little hack :) assing new var slice of old stae var
+
+    //"D" for deletion phase
+    const onNodeClickD = (index) => {
+        if (index === 1) {
+            console.log("woop");
+            let newTopArray = topArray;
+            newTopArray.push(tree[1]);
+            setTopArray(newTopArray);
+            let newTree = tree;
+            newTree[1] = {
+                id: "", contents: " ", ref: drop
+            };
+            //newTree[1].ref = drag
+            setTree(newTree);
+            if (true) {
+                setTipText("Drag the correct node to take the place of the old root node.");
+            }
+            //set tree root to nothing or smthing?
+        }
+        else {
+            setTipText("That is not the element that should be deleted next, try again");
+        }
+    }
+    //need to empty array as tree gets filled?
+    //need an arrow or colour pointing to element in array being placed in tree
     //Weird: grey looks smaller than black cirlce
     const nodeDisplay = (i) => {
         let result = [];
-        /*if (arIndex === elementList.length && isTreeComplete()) {
+        if (i > elementList.length) {//out of bounds
+            return result;
+        }
+        //temp!!!!!!!!! replace 6 with arIndex
+        //Tree is ordered and its time to delete root
+        if (6 === elementList.length && isTreeComplete()) {
             //deletion mode (getting ordered array)
-            console.log("deletion time");
-            if (i === 1) {
-                result.push(
-                <button className="circle" onClick={() => onNodeClick(i)}>
+            //console.log(tree);//delete root then drag node that should take its place? then drag around
+            result.push(
+                <button className="circle" onClick={() => onNodeClickD(i)} ref={tree[i].ref }>
                     <Element contents={tree[i].contents} id={tree[i].id} />
                 </button>)
-            }
-            else {//this is wrong! just temp for testing!!
-                result.push(
-                    <div className="circle" ref={tree[i].ref}>
-                        <Element contents={tree[i].contents} id={tree[i].id} />
-                    </div>
-                )
-            }
-        }*/
-        if (false) { }//got here^^ figure out deletion mode
+        }
+        //We're in deletion phase but the heap needs reordering
+        //temp!!!!!!!!! replace 6 with arIndex
+        else if (6 === elementList.length) {
+            result.push(
+                <div className="circle" ref={tree[i].ref} >
+                    <Element contents={tree[i].contents} id={tree[i].id} />
+                </div>
+            )
+        }
+        //Still filling up heap
         else {
-            if (i > elementList.length) {
-                //setArIndex(0);//cant set here- infinite re renders :( - but do need to set somewhere!
-                //set screen to deletetion mode or somthing! (all inserts are finished, time to delete)
-                return result;
-            }
             //If node has contents, display
             //NOT TO SELF, IS INDEX CORRECT HERE? COULD CAUSE WEIRD ERRORS SO KEEP LOOK OUT
             //console.log("tree ref: " + tree[i].ref);
@@ -291,12 +397,12 @@ function Heap() {
             }
             //If 1 has no content, we want to display it as a button (can't lump it in with children like below because root has no children)
             else if (i === 1) {
-                result.push(<button className="circle-grey" onClick={() => onNodeClick(i)}></button>)
+                result.push(<button className="circle-grey" onClick={() => onNodeClickI(i)}></button>)
             }
             //If the node's parent is showing, display node as grey button
             else if (i / 2 >= 1) {
                 if (tree[Math.floor(i / 2)].contents) {
-                    result.push(<button className="circle-grey" onClick={() => onNodeClick(i)}></button>)
+                    result.push(<button className="circle-grey" onClick={() => onNodeClickI(i)}></button>)
                 }
             }
         }
