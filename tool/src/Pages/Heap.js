@@ -202,13 +202,21 @@ function Heap() {
                     let newRoot = tree[droppedIndex];
                     newRoot.ref = drop;
                     newTree[1] = newRoot;
-                    if (newRoot.contents < tree[2].contents || newRoot.contents < tree[3].contents) {
+                    //this is causing issue! trying to access when out of bounds!
+                    if (tree.length == 3) {
+                        if (newRoot.contents < tree[2].contents) {
+                            setTipText("That's correct! Now the root needs sifting down the heap to maintiain the following property: " +
+                                "'A child node cannot be larger than a parent node'" +
+                                "\n Drag the largest child of the root to replace " + tree[1].contents);
+                        }
+                    }
+                    else if (newRoot.contents < tree[2].contents || newRoot.contents < tree[3].contents) {
                         setTipText("That's correct! Now the root needs sifting down the heap to maintiain the following property: " +
                             "'A child node cannot be larger than a parent node'" +
                             "\n Drag the largest child of the root to replace " + tree[1].contents);
                     }
                     else {
-                        setTipText("That's correct! Also, the new root is not smaller than either of its children so the heap does not need sifting");
+                        setTipText("That's correct! Also, the new root is not smaller than its children so the heap does not need sifting");
                     }
                     newTree.pop();
                     setTree(newTree);
@@ -411,6 +419,17 @@ function Heap() {
     //"D" for deletion phase
     const onNodeClickD = (index) => {
         console.log(isTreeComplete());
+        if (index === 1 && tree.length == 2) {
+            let newTopArray = topArray;
+            console.log("c: " + tree[1].contents + " id: " + tree[1].id);
+            newTopArray.push(tree[1]);
+            setTopArray(newTopArray);
+            let newTree = tree;
+            newTree.pop();
+            setTree(newTree);
+            setTipText("Well done, the array is fully sorted");
+            //This isn't working, could just redirect them to an end screen?
+        }
         if (index === 1 && isTreeComplete()) {//it has to be largest element in array!
             console.log("woop");
             let newTopArray = topArray;
