@@ -188,30 +188,40 @@ function Heap() {
         else if (mode === "deletion") {//deletion mode
             //NTS: big yikes, not index but id now, what is happening? it gave index in insertion mode!
             //target index still correct cos it just looks for chichever element has drop ref and retuns that index :)
+            console.log("indexOfDropped " + indexOfDropped);
             let droppedIndex = tree.findIndex(el => el.id === indexOfDropped);
+            let x = tree.findIndex(el => el.id === indexOfDropped);
 
             console.log(tree);
-            console.log(droppedIndex);
-            if (tree[1].contents === " " && droppedIndex === elementList.length) {
-                console.log("valid deletion mode drop");
-                let newTree = tree;
-                let newRoot = tree[droppedIndex];
-                newRoot.ref = drop;
-                newTree[1] = newRoot;
-                if (newRoot.contents < tree[2].contents || newRoot.contents < tree[3].contents) {
-                    setTipText("That's correct! Now the root needs sifting down the heap to maintiain the following property: " +
-                        "'A child node cannot be larger than a parent node'" +
-                        "\n Drag the largest child of the root to replace " + tree[1].contents);
-                }
-                else {
-                    setTipText("That's correct! Also, the new root is not smaller than either of its children so the heap does not need sifting");
-                }
-                newTree.pop();
-                setTree(newTree);
+            console.log("dropped index" + droppedIndex);
+            //User needs to drag the latest element to be the new root
+            if (tree[1].contents === " ") {
+                if (droppedIndex === tree.length - 1) {
+                    console.log("valid deletion mode drop");
+                    let newTree = tree;
+                    let newRoot = tree[droppedIndex];
+                    newRoot.ref = drop;
+                    newTree[1] = newRoot;
+                    if (newRoot.contents < tree[2].contents || newRoot.contents < tree[3].contents) {
+                        setTipText("That's correct! Now the root needs sifting down the heap to maintiain the following property: " +
+                            "'A child node cannot be larger than a parent node'" +
+                            "\n Drag the largest child of the root to replace " + tree[1].contents);
+                    }
+                    else {
+                        setTipText("That's correct! Also, the new root is not smaller than either of its children so the heap does not need sifting");
+                    }
+                    newTree.pop();
+                    setTree(newTree);
                 //delete last node from heap
                 //make left/right child a drop?
+                }
+                else {
+                    setTipText("That's not the correct node, try again.");
+                }
             }
-            else if (tree[1].contents) {//We're sifitng root down
+            //We're sifitng root down
+            else if (tree[1].contents) {
+                console.log("Got to sifting down logic");
                 if (indexOfTarget === Math.floor(droppedIndex / 2)) {
                     //if that was the biggest child, then swap. otherwise tell user that they have to choose biggest child
                     //if dropped index odd, its a left child otherwise its right
@@ -219,7 +229,7 @@ function Heap() {
                     if (droppedIndex % 2 !== 0) {
                         sibling = droppedIndex - 1;
                     }
-                    console.log(tree.length);
+                    console.log("tree.length: " + tree.length);
                     //If node has a sibling...
                     if (sibling < tree.length) {
                         //and sibling's contents are greater than the node the user dragged, we need to correct them
@@ -332,7 +342,8 @@ function Heap() {
     //Todo: rename to say it checks all parents are bigegr than children! not technically chekcing if complete cos spots might be missing in deletion
     const isTreeComplete = () => {
         //console.log("arr index " + arIndex);
-        for (let i = 2; i <= arIndex; i++) {
+        for (let i = 2; i <= tree.length-1; i++) {
+            //console.log("i: " + tree[i].contents + "    i/2: " + tree[Math.floor(i / 2)].contents)
             if (tree[i].contents > tree[Math.floor(i / 2)].contents) {
                 return false;
             }
@@ -399,7 +410,8 @@ function Heap() {
 
     //"D" for deletion phase
     const onNodeClickD = (index) => {
-        if (index === 1) {
+        console.log(isTreeComplete());
+        if (index === 1 && isTreeComplete()) {//it has to be largest element in array!
             console.log("woop");
             let newTopArray = topArray;
             newTopArray.push(tree[1]);
@@ -428,6 +440,7 @@ function Heap() {
             return result;
         }
         //Tree is ordered and its time to delete root
+        //console.log(tree);
         if (mode === "deletion" && isTreeComplete()) {
             //deletion mode (getting ordered array)
             //console.log(tree[i].ref);//delete root then drag node that should take its place? then drag around
