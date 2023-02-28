@@ -242,25 +242,19 @@ function Merge() {
         ]
     )
 
-    //use this for user swapping positions of elements in array
+    //Allows user to merge elements via drag n drop
     const mergeElement = (id) => {
         const latestElement = elementList.filter((element) => id === element.id);
         let foundAMatch = false;
-        //mergeArray.map(el => console.log("el.id " + el.id); el.id === id ? foundAMatch = true : foundAMatch = foundAMatch);
-        /*for (let i = 0; i < mergeArray.length; i++) {
-            console.log("id: " + mergeArray[i].id);
-        }*/
         //ToDo: VERY IMPORTANT- only allow one of each id in the target zone!
         //Also! make sure all elements have been added (ensure user can't leave one out and get away with it)
+
         if (true) {
             setMergeArray(mergeArray=>[...mergeArray, latestElement[0]]);
             console.log("new merge array: " + mergeArray);
     
         }
     }
-
-    //Should split button disappear as soon as split? avoids confusion, looks cleaner
-    //A "merge" button could go in it's place during merge time?
 
     //code to start merge: change colours, add text telling them to drag, empty div, check if new contents of div are ordered.
     //once an array is merged, readToMerge set back to false, merged set to true
@@ -316,6 +310,26 @@ function Merge() {
 
     const onMergeClick = (div) => {
         let sorted = true;
+        let allElements = true;
+        //if merge array contains each of the required elements and is the same length as two sub arrays added, we didnt miss any elements
+        for (let i = 0; i < arrays[div * 2].contents.length; i++) {
+            let index = mergeArray.findIndex(el => el.id === arrays[div * 2].contents[i].id);
+            console.log(index);
+            if (index === -1) {
+                allElements = false;
+            }
+        }
+        for (let i = 0; i < arrays[(div * 2) + 1].contents.length; i++) {
+            let index = mergeArray.findIndex(el => el.id === arrays[(div * 2) + 1].contents[i].id);
+            console.log(index);
+            if (index === -1) {
+                allElements = false;
+            }
+        }
+        console.log("Got all elements: " + allElements);//Got here!
+        if (mergeArray.length === arrays[div * 2].contents.length + arrays[(div * 2) + 1].contents.length) {
+            console.log("Poggers");
+        }
         //Checking if the array is sorted
         for (let i = 0; i < mergeArray.length - 1; i++) {
             if (mergeArray[i].contents > mergeArray[i + 1].contents) { sorted = false; break; }
@@ -355,7 +369,12 @@ function Merge() {
         let addButton = <div className="size-of-button" />;
         //console.log("merged? " + arrays[div].merged);
         if (!visibleDivs.includes(div * 2) && !arrays[div].merged) {
-            addButton = <button className="btn-split" onClick={() => onSplitClick(div)} >split</button>;
+            if (divToMerge !== 0) {
+                addButton = <button className="btn-split" onClick={() => onSplitClick(div)} disabled>split</button>;
+            }
+            else {
+                addButton = <button className="btn-split" onClick={() => onSplitClick(div)} >split</button>;
+            }
         }
         return addButton;
     }
@@ -574,44 +593,5 @@ function Merge() {
         </>
     );
 }
-
-/*function Merge() {
-    const [array, setArray] = useState([]);
-    const [{ isOver }, drop] = useDrop(() => ({
-        accept: "single-element",
-        drop: (item) => addElementToArr(item.id),
-        collect: (monitor) => ({
-            isOver: !!monitor.isOver(),
-        }),
-    }))
-    //use this for user swapping positions of elements in array
-    const addElementToArr = (id) => {
-        const latestElement = elementList.filter((element) => id === element.id);
-        //setArray((array) => [...array, latestElement[0]]); //adds multiple elements into array
-        setArray([latestElement[0]]); //only one element in array
-    }
-
-    return (
-        <>
-            <h1>hi</h1>
-            <div className="stage">
-                <div className="array">{ elementList.map((element) => {
-                return <Element contents={element.contents} id={ element.id }/>
-                })}
-                </div>
-                <button className="split" onClick={() => { splitClick() }} >split</button>
-                {row1()}
-                {row2()}
-                {row3()}
-                {row4()}
-                <div className="element-target" ref={ drop }>Add to merge class!!!!!!!!!!!!!!!!
-                    {array.map((element) => {
-                        return <Element contents={element.contents} id={element.id} />
-                    })}
-                </div>
-            </div>
-        </>
-    );
-}*/
 
 export default Merge;
