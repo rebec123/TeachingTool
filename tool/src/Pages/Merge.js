@@ -85,7 +85,12 @@ function Element({ id, contents, style }) {
             isDragging: !!monitor.isDragging(),
         })
     }))
-    return (<div className={style} ref={drag} style={{ "backgroundColor": isDragging ? "grey" : "white" }}>{contents}</div>);
+    if (style === "ar-el-grey") {
+        return (<div className={style} style={{ "backgroundColor": isDragging ? "grey" : "white" }}>{contents}</div>);//Not draggable
+    }
+    else {
+        return (<div className={style} ref={drag} style={{ "backgroundColor": isDragging ? "grey" : "white" }}>{contents}</div>);
+    }
 }
 //--------------should we seperate these helpers/utility functions to own file? are they even utility functions?------------------------------------
 //Given a div (a position in the graph formed by splitting an array in half recursively), this
@@ -223,7 +228,7 @@ function Merge() {
     const [mergeArray, setMergeArray] = useState([]);
     const [{ isOver }, drop] = useDrop(() => ({
         accept: "single-element",
-        drop: (element) => mergeElement(element.id),
+        drop: (element) => dropElement(element.id),
         collect: (monitor) => ({
             isOver: !!monitor.isOver(),
         }),
@@ -232,28 +237,17 @@ function Merge() {
 
     useEffect(
         () => {
-            /*for (let i = 0; i < mergeArray.length; i++) {
-                console.log("id: " + mergeArray[i].id);
-                console.log("value: " + mergeArray[i].contents);
-            }*/
         },
         [
-            mergeArray
+            mergeArray, divToMerge
         ]
     )
 
-    //Allows user to merge elements via drag n drop
-    const mergeElement = (id) => {
+    //Allows user to drop elements into the merge array
+    const dropElement = (id) => {
         const latestElement = elementList.filter((element) => id === element.id);
-        let foundAMatch = false;
-        //ToDo: VERY IMPORTANT- only allow one of each id in the target zone!
-        //Also! make sure all elements have been added (ensure user can't leave one out and get away with it)
-
-        if (true) {
-            setMergeArray(mergeArray=>[...mergeArray, latestElement[0]]);
-            console.log("new merge array: " + mergeArray);
-    
-        }
+        //KNOWN BUG- is possible for user to drag same element into merge array more than once (although program will reject answer and ask them to try again)
+        setMergeArray(mergeArray => [...mergeArray, latestElement[0]]);
     }
 
     //code to start merge: change colours, add text telling them to drag, empty div, check if new contents of div are ordered.
@@ -311,6 +305,7 @@ function Merge() {
     const onMergeClick = (div) => {
         let sorted = true;
         let allElements = true;
+        //TODO might need to readjust the "allElements" checking (parts may be redundant) after we get one el at time working
         //if merge array contains each of the required elements and is the same length as two sub arrays added, we didnt miss any elements
         for (let i = 0; i < arrays[div * 2].contents.length; i++) {
             let index = mergeArray.findIndex(el => el.id === arrays[div * 2].contents[i].id);
@@ -327,9 +322,15 @@ function Merge() {
             }
         }
         console.log("Got all elements: " + allElements);//Got here!
-        if (mergeArray.length === arrays[div * 2].contents.length + arrays[(div * 2) + 1].contents.length) {
-            console.log("Poggers");
+        if (mergeArray.length !== arrays[div * 2].contents.length + arrays[(div * 2) + 1].contents.length) {
+            allElements = false;
         }
+        if (!allElements) {
+            setTitle("Not quite...");//ToDo: change to helper text instead of title
+            setMergeArray([]);
+            return;
+        }
+        console.log("Got no extra elements: " + allElements);//Got here!
         //Checking if the array is sorted
         for (let i = 0; i < mergeArray.length - 1; i++) {
             if (mergeArray[i].contents > mergeArray[i + 1].contents) { sorted = false; break; }
