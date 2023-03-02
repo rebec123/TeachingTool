@@ -46,7 +46,7 @@ const elementList = [
     {
         id: 5,
         contents: 8
-    },
+    }/*,
 
     {
         id: 6,
@@ -65,7 +65,7 @@ const elementList = [
     {
         id: 9,
         contents: 1
-    }
+    }*/
 ]
 
 //ToDo:customise this for heap (number with no box) 
@@ -105,9 +105,11 @@ function Element({ id, contents }) {
 
 //NTS index in tree is NOT equal to element id throughout, only at beginnign
 
+//Need to empty array as tree is built
+
 const treeSetUp = () => {
     let result = [];
-    if (true) {//Temp!!!!: testing mode for deletion
+    if (false) {//Temp!!!!: testing mode for deletion
         result.push({});
         result.push({
             id: 5,
@@ -174,11 +176,11 @@ const treeSetUp = () => {
 //if they think tree needs rearranging, they can drag elements to swap them?
 //we have a function that calculates what tree should look like and compare it to what the user came up with
 function Heap() {
-    const [tipText, setTipText] = useState("Click where you think the next element in the array should go");
+    const [tipText, setTipText] = useState("Click where in the heap you think the next element in the array should go");
     const [tree, setTree] = useState(treeSetUp());
-    const [topArray, setTopArray] = useState([,]);//Code doesn't like this w/o comma
+    const [topArray, setTopArray] = useState(elementList);//useState([,]);//Code doesn't like this w/o comma
     const [arIndex, setArIndex] = useState(0);//start at 1 or 0?
-    const [mode, setMode] = useState("deletion")//temp!!!Change to start as insertion after we've finished coding deletion
+    const [mode, setMode] = useState("insertion")//temp!!!Change to start as insertion after we've finished coding deletion
     const [dropTarget, setDropTarget] = useState(0);
     const [{ isOver }, drop] = useDrop(() => ({
         accept: "single-element",
@@ -188,14 +190,27 @@ function Heap() {
         }),
     }))
 
+    useEffect(() => {
+        //console.log("arindex " + arIndex);
+        //console.log("tree length " +tree.length);
+        if (arIndex === tree.length -1 && isTreeComplete()) {
+            setMode("deletion");//not updating soon neough, uh oh! might need to move :/
+            setTopArray([,]);
+            setTipText("Click the node that should be deleted from the heap and added to the new ordered array");
+            console.log("mode in effects: " + mode);
+        }
+        
+    }, [arIndex]);
+
     const dropElement = (indexOfDropped) => {
         let indexOfTarget = tree.findIndex(el => el.ref === drop);
 
         console.log("dropped : " + indexOfDropped + " target : " + indexOfTarget);
+        console.log("mode in drop: " + mode);
         //insertion mode
         if (mode === "insertion") {
             if (indexOfTarget === Math.floor(indexOfDropped / 2) && tree[indexOfDropped].contents > tree[indexOfTarget].contents) {
-                console.log("Valid af!");
+                //console.log("Valid af!");
 
                 let swapNodeDropped = tree[indexOfDropped];
                 let swapNodeTarget = tree[indexOfTarget];
@@ -205,10 +220,14 @@ function Heap() {
                 newTree[indexOfDropped].ref = undefined;
                 newTree[indexOfTarget] = swapNodeDropped;
                 setTree(newTree);
-                console.log(tree);
-                console.log(indexOfTarget);
+                //console.log(tree);
+                //console.log(indexOfTarget);
                 //setTipText("You swapped " + tree[indexOfTarget].contents + " and " + tree[indexOfDropped].contents);//We need to change something in this Heap component so page refreshes and we see reult of swappign nodes
                 needToReorder(indexOfTarget)//was index of dropped but they've swapped now
+                console.log("tree len: " + tree.length + " ele len: " + elementList.length);
+                if (isTreeComplete() && tree.length === elementList.length) {
+                    console.log("Deletion time");
+                }
             }
             else {
                 console.log("not valid");
@@ -221,7 +240,7 @@ function Heap() {
             let droppedIndex = tree.findIndex(el => el.id === indexOfDropped);
             let x = tree.findIndex(el => el.id === indexOfDropped);
 
-            console.log(tree);
+            //console.log(tree);
             console.log("dropped index" + droppedIndex);
             //User needs to drag the latest element to be the new root
             if (tree[1].contents === " ") {
@@ -288,8 +307,8 @@ function Heap() {
                     newTree[indexOfTarget] = swapNodeDropped;
                     setTree(newTree);
                     setTipText("Yaaas.");
-                    console.log(droppedIndex);
-                    console.log(indexOfTarget);
+                    //console.log(droppedIndex);
+                    //console.log(indexOfTarget);
                     needToReorder(droppedIndex);
                 }
                 else {
@@ -310,7 +329,25 @@ function Heap() {
 
     const array = () => {
         const result = [];
-        if (true) {//temp!!!!! change so there's a state that maintains what should appear in this array
+        if (mode === "insertion") {//temp!!!!! change so there's a state that maintains what should appear in this array
+            //shouldn't be element list! just temporary. If numbers aren't in array (been removed) should still maintain each posiition so we see empty array properly
+            //need to make ar-el-container a drag target during deletion process?? Or should user just becale to click the node they want to delete?
+            //console.log(elementList);
+            result.push(
+                <>
+                    {
+                        topArray.map(element => {
+                            return (
+                                <div className="ar-el-container">
+                                    <Element contents={element.contents} id={element.id} />
+                                </div>
+                            )
+                        })
+                    }
+                </>
+            );  
+        }
+        else {//deletion mode
             topArray.map(element => {
                 result.push(
                     <div className="ar-el-container">
@@ -328,25 +365,6 @@ function Heap() {
                     </div>
                 )
             }
-        }
-        else {
-
-            //shouldn't be element list! just temporary. If numbers aren't in array (been removed) should still maintain each posiition so we see empty array properly
-            //need to make ar-el-container a drag target during deletion process?? Or should user just becale to click the node they want to delete?
-            //console.log(elementList);
-            result.push(
-                <>
-                    {
-                        elementList.map(element => {
-                            return (
-                                <div className="ar-el-container">
-                                    <Element contents={element.contents} id={element.id} />
-                                </div>
-                            )
-                        })
-                    }
-                </>
-            );
 
         } 
 
@@ -392,7 +410,7 @@ function Heap() {
     }
     //Return true if the tree needs rearranging, false if not
     const needToReorder = (index) => {
-        console.log(tree);
+        //console.log(tree);
         if (mode === "insertion") {
             if (index === 1) {
                 setTipText("Click stuff innit");
@@ -419,7 +437,7 @@ function Heap() {
                 let newTree = tree;
                 newTree[Math.floor(index)].ref = drop;
                 setTree(newTree);
-                console.log(newTree);
+                //console.log(newTree);
                 return true;
             }
         }
@@ -436,27 +454,23 @@ function Heap() {
             let newTree = tree;
             newTree[index].contents = newContents;//using position in array since we're just filling out tree
             setTree(newTree);
-            /*setTree(oldTree.map(
-                el => (el.id === i ? Object.assign(el, { contents: newContents }) : el)
-            ));*/
+            let newArray = topArray;
+            newArray[arIndex].contents = "";
+            setTopArray(newArray);
             setArIndex(arIndex + 1);
-            //Is this right?????
-            if (arIndex === tree.length && isTreeComplete()) {
-                setMode("deletion");
-                setTipText("Click the node that should be deleted from the heap and added to the new ordered array");
-            }
-            else {
-                setTipText("Click where you think the next element in the array should go");
-            }
+
+            setTipText("Click where you think the next element in the array should go");
+            
             //Need to check that the child is less than parent (so it's a valid max heap);
             //console.log(tree);
-            if (needToReorder(index)) {//dont forget to pass this method args you numpty!
-                //reorder time!
-            }
+            needToReorder(index);
             
         }
+        else if (!isTreeComplete()) {
+            setTipText("Not quite. The heap needs reordering so no child is greater than it's parent.");
+        }
         else {
-            setTipText("That's not the next position, try again.");
+            setTipText("Not quite. Are you choosing the next available position in the heap correctly?");
         }
     }
 
@@ -549,6 +563,52 @@ function Heap() {
         return (result); 
     }
 
+    const nodeLines = (start, end) => {
+        let leftLine = true;
+        let result = [];
+        for (let i = start; i <= end; i++) {
+            //console.log(tree.length);
+            if (i > tree.length - 1) {//Node isn't on display so line shouldn't be either
+                result.push(
+                    <>
+                        <div className="flex-container" />
+                        <div className="flex-container" />
+                    </>
+                );
+            }
+            else if (!tree[Math.floor(i/2)].contents) {
+                result.push(
+                    <>
+                        <div className="flex-container" />
+                        <div className="flex-container" />
+                    </>
+                );
+            }
+            else if (leftLine) {
+                result.push(
+                    <>
+                        <div className="flex-container" />
+                        <div className="flex-container"><div className="line-left" /></div>
+                    </>
+                );
+                leftLine = false;
+            }
+            else {
+                result.push(
+                    <>
+                        <div className="flex-container"><div className="line-right" /></div>
+                        <div className="flex-container" />
+                    </>
+                );
+                leftLine = true;
+            }
+
+        }
+        return (<div className="flex-container">
+            {result} 
+        </div>);
+    }
+
     const displayHeap = () => {//need way to determine nodes in deletion mode 
         //root should be a button (to delete node an dadd to main array), then should be able to drag latest elemnt to root and shift stuff
         let result = [];
@@ -564,28 +624,14 @@ function Heap() {
 
             result.push(
                 <>
-                    <div className="flex-container">
-                        <div className="flex-container" />
-                        <div className="flex-container"><div className="line-left"/></div>
-                        <div className="flex-container"><div className="line-right" /></div>
-                        <div className="flex-container"/>
-                    </div>
+                    {nodeLines(2,3)}
 
                     <div className="flex-container">
                         <div className="heap-div">{nodeDisplay(2)}</div>
                         <div className="heap-div">{nodeDisplay(3)}</div>
                     </div>
 
-                    <div className="flex-container">
-                        <div className="flex-container" />
-                        <div className="flex-container"><div className="line-left" /></div>
-                        <div className="flex-container"><div className="line-right" /></div>
-                        <div className="flex-container" />
-                        <div className="flex-container" />
-                        <div className="flex-container"><div className="line-left" /></div>
-                        <div className="flex-container"><div className="line-right" /></div>
-                        <div className="flex-container" />
-                    </div>
+                    {nodeLines(4, 7)}
 
                     <div className="flex-container">
                         <div className="heap-div">{nodeDisplay(4)}</div>
@@ -594,24 +640,7 @@ function Heap() {
                         <div className="heap-div">{nodeDisplay(7)}</div>
                     </div>
 
-                    <div className="flex-container">
-                        <div className="flex-container" />
-                        <div className="flex-container"><div className="line-left" /></div>
-                        <div className="flex-container"><div className="line-right" /></div>
-                        <div className="flex-container" />
-                        <div className="flex-container" />
-                        <div className="flex-container"><div className="line-left" /></div>
-                        <div className="flex-container"><div className="line-right" /></div>
-                        <div className="flex-container" />
-                        <div className="flex-container" />
-                        <div className="flex-container"><div className="line-left" /></div>
-                        <div className="flex-container"><div className="line-right" /></div>
-                        <div className="flex-container" />
-                        <div className="flex-container" />
-                        <div className="flex-container"><div className="line-left" /></div>
-                        <div className="flex-container"><div className="line-right" /></div>
-                        <div className="flex-container" />
-                    </div>
+                    {nodeLines(8, 15)}
 
                     <div className="flex-container">
                         <div className="heap-div">{nodeDisplay(8)}</div>
