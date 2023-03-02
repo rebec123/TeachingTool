@@ -221,6 +221,7 @@ function Merge() {
     //GOOD TO KNOW: page is re-rendered everytime you set state
     //do not change state INSIDE render, because you will get stuck in endless loop and hang!
     const [title, setTitle] = useState("Merge Sort");
+    const [tipText, setTipText] = useState("Click 'split' to start splitting the array in half.");
     const [mode, setMode] = useState("splitting");//ToDo:change to merging when in merge mode, this should disable split buttons until meregd??
     const [visibleDivs, setVisibleDivs] = useState([1]);
     const [arrays, setArrays] = useState(divContents());
@@ -253,13 +254,13 @@ function Merge() {
     //code to start merge: change colours, add text telling them to drag, empty div, check if new contents of div are ordered.
     //once an array is merged, readToMerge set back to false, merged set to true
     const mergeMode = (parent, child1, child2) => {
-        console.log("Called!!")
         let oldArrays = arrays;
         //let newContents = arrays[parent].contents.map(el => Object.assign(el, { contents: "_" }));
         setDivToMerge(parent);
         setArrays(oldArrays.map(
             ar => ((ar.index !== parent && ar.index !== child1 && ar.index !== child2) ? Object.assign(ar, { style: "ar-el-grey" }) : ar)
         ));
+        setTipText("Merge the two highlighted arrays into one. Drag the elements into the new array in order of lowest to highest.")
         /*setArrays(oldArrays.map(
             ar => ((ar.index === parent) ? Object.assign(ar, { contents: newContents }) : ar)
         ));*/
@@ -270,7 +271,7 @@ function Merge() {
         let child1 = i * 2;
         let child2 = (i * 2) + 1;
         if (arrays[child1].merged && arrays[child2].merged) {
-            console.log(i + " is ready to merge");
+            //console.log(i + " is ready to merge");
             let oldArrays = arrays;
             //CHECK STILL WORKS
             setArrays(oldArrays.map(
@@ -326,7 +327,7 @@ function Merge() {
             allElements = false;
         }
         if (!allElements) {
-            setTitle("Not quite...");//ToDo: change to helper text instead of title
+            setTipText("That's not quite right. Make sure you have included all the elements from the child arrays and you aren't adding any elements twice.");//ToDo: change to helper text instead of title
             setMergeArray([]);
             return;
         }
@@ -345,7 +346,12 @@ function Merge() {
             setArrays(oldArrays.map(
                 ar => (ar.index === div ? Object.assign(ar, { contents: mergeArray, merged: true, readyToMerge: false }) : ar)
             ));
-            setTitle("Merge Sort");//ToDo: change to helper text instead of title
+            if (div === 1) {
+                setTipText("Done! Congrats!!!!")
+            }
+            else {
+                setTipText("That's right! Continue splitting the arrays that have not yet been split.");//ToDo: change to helper text instead of title
+            }
             //Resetting merge state values
             setDivToMerge(0);
             setMergeArray([]);
@@ -360,7 +366,7 @@ function Merge() {
             isMergePossible(Math.floor(div / 2));
         }
         else {
-            setTitle("Not quite...");//ToDo: change to helper text instead of title
+            setTipText("That's not quite right. Make sure you are ordering the elements from lowest to highest.");//ToDo: change to helper text instead of title
             setMergeArray([]);
         }
     }
@@ -386,7 +392,7 @@ function Merge() {
         if (divToMerge === i) {
             result.push(
                 <>
-                <div className="sub-stage">
+                <div className="flex-stage">
                     <div className="array-and-div">
                         <div className="element-target" ref={drop} >
                         {mergeArray.map((element) => {
@@ -402,7 +408,7 @@ function Merge() {
         else {
             result.push(
                 <>
-                <div className="sub-stage">
+                <div className="flex-stage">
                     <div className="array">{arrays[i].contents.map((element) => {
                         return <Element contents={element.contents} id={element.id} style={arrays[i].style} />
                     })}
@@ -458,7 +464,7 @@ function Merge() {
             
         }
         return (
-            <div className="sub-stage">
+            <div className="flex-stage">
                 {result}
             </div>
         );
@@ -501,7 +507,7 @@ function Merge() {
             }
         }
         return (
-            <div className="sub-stage">
+            <div className="flex-stage">
                 {result}
             </div>
         );
@@ -544,7 +550,7 @@ function Merge() {
             }
         }
         return (
-            <div className="sub-stage">
+            <div className="flex-stage">
                 {result}
             </div>
         );
@@ -574,7 +580,7 @@ function Merge() {
             }
         }
         return (
-            <div className="sub-stage">
+            <div className="flex-stage">
                 {result}
             </div>
         );
@@ -583,12 +589,17 @@ function Merge() {
     return (
         <>
             <h1>{title}</h1>
-            <div className="stage">
-                {row0()}
-                {row1()}
-                {row2()}
-                {row3()}
-                {row4()}
+            <div className="flex-stage">
+                <div className="merge-container">
+                    {row0()}
+                    {row1()}
+                    {row2()}
+                    {row3()}
+                    {row4()}
+                </div>
+                <div className="merge-text-container">
+                    {tipText}
+                </div>
                 
             </div>
         </>

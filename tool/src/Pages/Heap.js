@@ -51,6 +51,20 @@ const elementList = [
     {
         id: 6,
         contents: 7
+    },
+    {
+        id: 7,
+        contents: 2
+    },
+
+    {
+        id: 8,
+        contents: 1
+    },
+
+    {
+        id: 9,
+        contents: 1
     }
 ]
 
@@ -123,6 +137,21 @@ const treeSetUp = () => {
         result.push({
             id: 3,
             contents: 3,
+            ref: undefined
+        });
+        result.push({
+            id: 7,
+            contents:2,
+            ref: undefined
+        });
+        result.push({
+            id: 8,
+            contents: 1,
+            ref: undefined
+        });
+        result.push({
+            id: 9,
+            contents: 1,
             ref: undefined
         });
 
@@ -224,7 +253,7 @@ function Heap() {
                 //make left/right child a drop?
                 }
                 else {
-                    setTipText("That's not the correct node, try again.");
+                    setTipText("That's not the correct node. Are you choosing the last element in the heap?");
                 }
             }
             //We're sifitng root down
@@ -259,6 +288,9 @@ function Heap() {
                     newTree[indexOfTarget] = swapNodeDropped;
                     setTree(newTree);
                     setTipText("Yaaas.");
+                    console.log(droppedIndex);
+                    console.log(indexOfTarget);
+                    needToReorder(droppedIndex);
                 }
                 else {
                     setTipText("That's not a child of the node you're trying to swap. Try again.")
@@ -361,21 +393,35 @@ function Heap() {
     //Return true if the tree needs rearranging, false if not
     const needToReorder = (index) => {
         console.log(tree);
-        if (index === 1) {
-            setTipText("Click stuff innit");
-            return false;//Only one node in tree so no need to reorder
-        } //can i get out of bounds below?? check if this code needs error checking 
-        else if (tree[index].contents > tree[Math.floor(index / 2)].contents) {
-            setTipText("Looks like you need to switch nodes to hold the property: \n'A child node cannot be larger than a parent node'");
-            let newTree = tree;
-            newTree[Math.floor(index / 2)].ref = drop;
-            setTree(newTree);
-            console.log(newTree);
-            return true;
+        if (mode === "insertion") {
+            if (index === 1) {
+                setTipText("Click stuff innit");
+                return false;//Only one node in tree so no need to reorder
+            }
+            //can i get out of bounds below?? check if this code needs error checking 
+            else if (tree[index].contents > tree[Math.floor(index / 2)].contents) {
+                setTipText("Looks like you need to switch nodes to hold the property: \n'A child node cannot be larger than a parent node'");
+                let newTree = tree;
+                newTree[Math.floor(index / 2)].ref = drop;
+                setTree(newTree);
+                console.log(newTree);
+                return true;
+            }
+            else {
+                setTipText("Click stuff innit");//tell them to click where next thing should go unless array all in tree now, then tell them to delete a node?
+                return false;
+            }
         }
-        else {
-            setTipText("Click stuff innit");//tell them to click where next thing should go unless array all in tree now, then tell them to delete a node?
-            return false;
+        else {//deletion mode
+            //add error checking, maybe make its own function because repetition from "dropElement"
+            if (tree[index].contents < tree[index * 2].contents || tree[index].contents < tree[(index * 2) +1].contents) {
+                setTipText("That's right! Looks like you need to switch nodes to hold the property: \n'A child node cannot be larger than a parent node'");
+                let newTree = tree;
+                newTree[Math.floor(index)].ref = drop;
+                setTree(newTree);
+                console.log(newTree);
+                return true;
+            }
         }
     }
     //"I" for insertion phase
@@ -518,16 +564,64 @@ function Heap() {
 
             result.push(
                 <>
-                    <div className="heap-div">
+                    <div className="flex-container">
+                        <div className="flex-container" />
+                        <div className="flex-container"><div className="line-left"/></div>
+                        <div className="flex-container"><div className="line-right" /></div>
+                        <div className="flex-container"/>
+                    </div>
+
+                    <div className="flex-container">
                         <div className="heap-div">{nodeDisplay(2)}</div>
                         <div className="heap-div">{nodeDisplay(3)}</div>
                     </div>
 
-                    <div className="heap-div">
+                    <div className="flex-container">
+                        <div className="flex-container" />
+                        <div className="flex-container"><div className="line-left" /></div>
+                        <div className="flex-container"><div className="line-right" /></div>
+                        <div className="flex-container" />
+                        <div className="flex-container" />
+                        <div className="flex-container"><div className="line-left" /></div>
+                        <div className="flex-container"><div className="line-right" /></div>
+                        <div className="flex-container" />
+                    </div>
+
+                    <div className="flex-container">
                         <div className="heap-div">{nodeDisplay(4)}</div>
                         <div className="heap-div">{nodeDisplay(5)}</div>
                         <div className="heap-div">{nodeDisplay(6)}</div>
                         <div className="heap-div">{nodeDisplay(7)}</div>
+                    </div>
+
+                    <div className="flex-container">
+                        <div className="flex-container" />
+                        <div className="flex-container"><div className="line-left" /></div>
+                        <div className="flex-container"><div className="line-right" /></div>
+                        <div className="flex-container" />
+                        <div className="flex-container" />
+                        <div className="flex-container"><div className="line-left" /></div>
+                        <div className="flex-container"><div className="line-right" /></div>
+                        <div className="flex-container" />
+                        <div className="flex-container" />
+                        <div className="flex-container"><div className="line-left" /></div>
+                        <div className="flex-container"><div className="line-right" /></div>
+                        <div className="flex-container" />
+                        <div className="flex-container" />
+                        <div className="flex-container"><div className="line-left" /></div>
+                        <div className="flex-container"><div className="line-right" /></div>
+                        <div className="flex-container" />
+                    </div>
+
+                    <div className="flex-container">
+                        <div className="heap-div">{nodeDisplay(8)}</div>
+                        <div className="heap-div">{nodeDisplay(9)}</div>
+                        <div className="heap-div">{nodeDisplay(10)}</div>
+                        <div className="heap-div">{nodeDisplay(11)}</div>
+                        <div className="heap-div">{nodeDisplay(12)}</div>
+                        <div className="heap-div">{nodeDisplay(13)}</div>
+                        <div className="heap-div">{nodeDisplay(14)}</div>
+                        <div className="heap-div">{nodeDisplay(15)}</div>
                     </div>
                 </>
             )
