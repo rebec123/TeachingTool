@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDrop, useDrag } from "react-dnd";
+import Confetti from 'react-confetti'
 //import Tree from 'react-d3-tree';
 
 //not usre we need this anymore
@@ -181,7 +182,7 @@ function Heap() {
     const [topArray, setTopArray] = useState(elementList);//useState([,]);//Code doesn't like this w/o comma
     const [arIndex, setArIndex] = useState(0);//start at 1 or 0?
     const [mode, setMode] = useState("insertion")//temp!!!Change to start as insertion after we've finished coding deletion
-    const [dropTarget, setDropTarget] = useState(0);
+    const [done, setDone] = useState(false);
     const [{ isOver }, drop] = useDrop(() => ({
         accept: "single-element",
         drop: (element) => dropElement(element.id),
@@ -497,6 +498,7 @@ function Heap() {
             newTree.pop();
             setTree(newTree);
             setTipText("Well done, the array is fully sorted");
+            setDone(true);
             //This isn't working, could just redirect them to an end screen?
         }
         if (index === 1 && isTreeComplete()) {//it has to be largest element in array!
@@ -668,15 +670,34 @@ function Heap() {
         return result;
         
     }
+    const pageContents = () => {
+        if (done) {
+            return (
+                <>
+                    <h1>Well Done!!!!</h1>
+                    <div className="stage">
+                        <Confetti recycle={false} numberOfPieces="100" />
+                    </div>
+                </>
+            );
+        }
+        else {
+            return (
+                <>
+                    <h1>Heap Sort</h1>
+                    <div className="stage">
+                        {array()}
+                        {heapAndTips()}
+
+                    </div>
+                </>
+            );
+        }
+    }
 
     return (
         <>
-            <h1>Heap Sort</h1>
-            <div className="stage">
-                {array()}
-                {heapAndTips()}
-                
-            </div>
+            {pageContents()}
         </>
     );
 }

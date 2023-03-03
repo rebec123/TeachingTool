@@ -10,7 +10,6 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
 import About from "./Pages/About";
-//import Menu from "./Pages/Menu";
 import Merge from "./Pages/Merge";
 import Heap from "./Pages/Heap";
 

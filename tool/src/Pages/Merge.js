@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useDrop, useDrag } from "react-dnd";
 //import { toBeVisible } from "../../node_modules/@testing-library/jest-dom/dist/to-be-visible";
 import cloneDeep from 'lodash/cloneDeep';//Need deep clones to ensure each split array can be rearranged w/o effecting all arrays
+import Confetti from 'react-confetti'
 
 /*const algorithm = ["mergeSort(A)", "If array length > 1", "Split the array in to two halves: S1 and S2",
     "call mergeSort(S1)", "call mergeSort(S2)", "call merge(S1, S2, A)", "\n", "merge(S1, S2, A)",
@@ -37,7 +38,7 @@ const elementList = [
     {
         id: 6,
         contents: 7
-    },
+    }/*,
 
     {
         id: 7,
@@ -72,7 +73,7 @@ const elementList = [
     {
         id: 13,
         contents: 3
-    }
+    }*/
 
 ]
 const _kMaxNumOfDivs = 31;
@@ -220,13 +221,14 @@ const divContents = () => {
 function Merge() {
     //GOOD TO KNOW: page is re-rendered everytime you set state
     //do not change state INSIDE render, because you will get stuck in endless loop and hang!
-    const [title, setTitle] = useState("Merge Sort");
+    //const [title, setTitle] = useState("Merge Sort");
     const [tipText, setTipText] = useState("Click 'split' to start splitting the array in half.");
     const [mode, setMode] = useState("splitting");//ToDo:change to merging when in merge mode, this should disable split buttons until meregd??
     const [visibleDivs, setVisibleDivs] = useState([1]);
     const [arrays, setArrays] = useState(divContents());
     const [divToMerge, setDivToMerge] = useState(0);
     const [mergeArray, setMergeArray] = useState([]);
+    const [done, setDone] = useState(false);
     const [{ isOver }, drop] = useDrop(() => ({
         accept: "single-element",
         drop: (element) => dropElement(element.id),
@@ -347,7 +349,7 @@ function Merge() {
                 ar => (ar.index === div ? Object.assign(ar, { contents: mergeArray, merged: true, readyToMerge: false }) : ar)
             ));
             if (div === 1) {
-                setTipText("Done! Congrats!!!!")
+                setDone(true);
             }
             else {
                 setTipText("That's right! Continue splitting the arrays that have not yet been split.");//ToDo: change to helper text instead of title
@@ -586,22 +588,44 @@ function Merge() {
         );
     }
 
+    const pageContents = () => {
+        if (done) {//chanhe back to "done" after testing
+            //can change confetti colours!
+            //could adjust amount of confetti based on user's score
+            return (
+                <>
+                    <h1>Well Done!!!!</h1>
+                    <div className="stage">
+                        <Confetti recycle={false} numberOfPieces="100"/>
+                    </div>
+                </>
+            );
+        }
+        else {
+            return (
+                <>
+                    <h1>Merge Sort</h1>
+                    <div className="flex-stage">
+                        <div className="merge-container">
+                            {row0()}
+                            {row1()}
+                            {row2()}
+                            {row3()}
+                            {row4()}
+                        </div>
+                        <div className="merge-text-container">
+                            {tipText}
+                        </div>
+
+                    </div>
+                </>
+                );
+        }
+    }
+
     return (
         <>
-            <h1>{title}</h1>
-            <div className="flex-stage">
-                <div className="merge-container">
-                    {row0()}
-                    {row1()}
-                    {row2()}
-                    {row3()}
-                    {row4()}
-                </div>
-                <div className="merge-text-container">
-                    {tipText}
-                </div>
-                
-            </div>
+            {pageContents()}
         </>
     );
 }
