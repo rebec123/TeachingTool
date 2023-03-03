@@ -188,27 +188,25 @@ function Heap() {
         collect: (monitor) => ({
             isOver: !!monitor.isOver(),
         }),
-    }))
+    }),
+    [mode, arIndex])//add tree to this and ifx out the id index mystery (wasn't updating state properly before hence hwy got differen things)
 
-    useEffect(() => {
-        //console.log("arindex " + arIndex);
-        //console.log("tree length " +tree.length);
-        if (arIndex === tree.length -1 && isTreeComplete()) {
-            setMode("deletion");//not updating soon neough, uh oh! might need to move :/
-            setTopArray([,]);
-            setTipText("Click the node that should be deleted from the heap and added to the new ordered array");
-            console.log("mode in effects: " + mode);
-        }
+    /*useEffect(() => {
+        setTipText("Click the node that should be deleted from the heap and added to the new ordered array");
+        console.log("mode in effects: " + mode);
         
-    }, [arIndex]);
+    }, [mode]);*/
 
-    const dropElement = (indexOfDropped) => {
+    const dropElementD = (indexOfDropped) => {
+        console.log("Deletion drop " + indexOfDropped);
+    }
+
+    function dropElement(indexOfDropped){
         let indexOfTarget = tree.findIndex(el => el.ref === drop);
-
-        console.log("dropped : " + indexOfDropped + " target : " + indexOfTarget);
         console.log("mode in drop: " + mode);
+        console.log("dropped : " + indexOfDropped + " target : " + indexOfTarget);
         //insertion mode
-        if (mode === "insertion") {
+        if (mode ==="insertion") {
             if (indexOfTarget === Math.floor(indexOfDropped / 2) && tree[indexOfDropped].contents > tree[indexOfTarget].contents) {
                 //console.log("Valid af!");
 
@@ -225,15 +223,19 @@ function Heap() {
                 //setTipText("You swapped " + tree[indexOfTarget].contents + " and " + tree[indexOfDropped].contents);//We need to change something in this Heap component so page refreshes and we see reult of swappign nodes
                 needToReorder(indexOfTarget)//was index of dropped but they've swapped now
                 console.log("tree len: " + tree.length + " ele len: " + elementList.length);
-                if (isTreeComplete() && tree.length === elementList.length) {
-                    console.log("Deletion time");
+                if (isTreeComplete() && tree.length-1 === elementList.length) {
+                    setMode("deletion");//not updating soon neough, uh oh! might need to move :/
+                    setTopArray([,]);
+                    setTipText("Click the node that should be deleted from the heap and added to the new ordered array");
+                    console.log("deletion time babyyyyy");
+                    console.log("just set mode in drop: " + mode);
                 }
             }
             else {
                 console.log("not valid");
             }
-        }
-        else if (mode === "deletion") {//deletion mode
+        }//not setting to deletion mode in here when you shoudl?
+        else if (mode ==="deletion") {//changed this from mode==="deletion";
             //NTS: big yikes, not index but id now, what is happening? it gave index in insertion mode!
             //target index still correct cos it just looks for chichever element has drop ref and retuns that index :)
             console.log("indexOfDropped " + indexOfDropped);
@@ -329,6 +331,7 @@ function Heap() {
 
     const array = () => {
         const result = [];
+        //console.log("arra: " + mode);
         if (mode === "insertion") {//temp!!!!! change so there's a state that maintains what should appear in this array
             //shouldn't be element list! just temporary. If numbers aren't in array (been removed) should still maintain each posiition so we see empty array properly
             //need to make ar-el-container a drag target during deletion process?? Or should user just becale to click the node they want to delete?
@@ -410,7 +413,7 @@ function Heap() {
     }
     //Return true if the tree needs rearranging, false if not
     const needToReorder = (index) => {
-        //console.log(tree);
+        //console.log(mode);
         if (mode === "insertion") {
             if (index === 1) {
                 setTipText("Click stuff innit");
@@ -464,7 +467,7 @@ function Heap() {
             //Need to check that the child is less than parent (so it's a valid max heap);
             //console.log(tree);
             needToReorder(index);
-            
+
         }
         else if (!isTreeComplete()) {
             setTipText("Not quite. The heap needs reordering so no child is greater than it's parent.");
@@ -472,12 +475,18 @@ function Heap() {
         else {
             setTipText("Not quite. Are you choosing the next available position in the heap correctly?");
         }
+        if (isTreeComplete() && arIndex === elementList.length - 1) {
+            setMode("deletion");//not updating soon neough, uh oh! might need to move :/
+            setTopArray([,]);
+            setTipText("Click the node that should be deleted from the heap and added to the new ordered array");
+            console.log("deletion time baby");
+           // console.log("mode in  clikc: " + mode);
+        }
     }
-
-    //NTS: if page isnt rerendering immediatile, slice(); is a little hack :) assing new var slice of old stae var
 
     //"D" for deletion phase
     const onNodeClickD = (index) => {
+        //console.log("on click " + mode);
         console.log(isTreeComplete());
         if (index === 1 && tree.length == 2) {
             let newTopArray = topArray;
