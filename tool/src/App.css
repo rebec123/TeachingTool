@@ -3,7 +3,8 @@
     --circle-height: 65px;
 }
 .App {
-  text-align: center;
+    text-align: center;
+    font-family: Calibri;
 }
 
 .App-logo {
@@ -133,6 +134,8 @@
     border: 3px solid orange;
     width: 30%;
     height: 100%;
+    white-space: pre-wrap;
+    text-align: left;
 }
 
 .merge-container {
@@ -145,6 +148,8 @@
     border: 3px solid blue;
     width: 30%;
     height: 100%;
+    white-space: pre-wrap;
+    text-align:left;
 }
 
 .ar-el-bare {
@@ -210,3 +215,41 @@
     justify-content: center;
     align-items: center;
 }
+
+.homeButton{
+    color: black;
+    text-decoration:none;
+}
+
+.header {
+    width: 70%;
+    height: auto;
+    background-color: #00502F;
+    padding: 2px;
+    align-self: center;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 10px;
+}
+
+.title-ppt-style {
+    color: white;
+    font-weight: normal;
+    font-size:40px;
+}
+
+.btn-navy {
+    width: 10%;
+    background-color: #000099;
+    color: white;
+    font-size: 25px;
+    font-weight: 100;
+    border-radius: 12px;
+    border:2px solid white;
+    padding: 10px;
+}
+
+    .btn-navy:hover,
+    .btn-navy:focus {
+        background-color: #00004A;
+    }

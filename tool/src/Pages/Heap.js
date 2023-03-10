@@ -19,7 +19,34 @@ import Confetti from 'react-confetti'
             />
         </div>
     );
-}*/
+}
+{
+        id: 1,
+        contents: 6
+    },
+
+    {
+        id: 2,
+        contents: 5
+    },
+
+    {
+        id: 3,
+        contents: 3
+    },
+
+    {
+        id: 4,
+        contents: 1
+    },
+
+    {
+        id: 5,
+        contents: 8
+    }
+
+
+*/
 
 //When user needs to switch node position, that should be text tip until they've done it
 
@@ -48,10 +75,9 @@ const elementList = [
         id: 5,
         contents: 8
     }/*,
-
     {
         id: 6,
-        contents: 7
+        contents: 10
     },
     {
         id: 7,
@@ -81,28 +107,6 @@ function Element({ id, contents }) {
     //should item disappear while being dragged? i rekon so
     return (<div className="ar-el-bare" ref={drag}>{contents}</div>);//style={{ "backgroundColor": isDragging ? "grey" : "none" }
 }
-
-//This is seperate function because it's allows us to have multiple active drop targets at once
-/*function DropTarget({ targetID, contents, handleDropFunct }) {
-    const [{ isOver }, drop] = useDrop(() => ({
-        accept: "single-element",
-        drop: (element) => dropElement(element.id, targetID),
-        collect: (monitor) => ({
-            isOver: !!monitor.isOver(),
-        }),
-    }))
-
-    const dropElement = (droppedID, targetID) => {
-        handleDropFunct(droppedID, targetID);
-        //setTipText("heyooooooo");
-
-    }
-    return (
-        <div className="circle" ref={drop}>
-            <Element contents={contents} id={targetID} />
-        </div>
-    )
-}*/
 
 //NTS index in tree is NOT equal to element id throughout, only at beginnign
 
@@ -177,7 +181,7 @@ const treeSetUp = () => {
 //if they think tree needs rearranging, they can drag elements to swap them?
 //we have a function that calculates what tree should look like and compare it to what the user came up with
 function Heap() {
-    const [tipText, setTipText] = useState("Click where in the heap you think the next element in the array should go");
+    const [tipText, setTipText] = useState("Click the position in the heap where the next element from the array should go.");
     const [tree, setTree] = useState(treeSetUp());
     const [topArray, setTopArray] = useState(elementList);//useState([,]);//Code doesn't like this w/o comma
     const [arIndex, setArIndex] = useState(0);//start at 1 or 0?
@@ -219,16 +223,13 @@ function Heap() {
                 newTree[indexOfDropped].ref = undefined;
                 newTree[indexOfTarget] = swapNodeDropped;
                 setTree(newTree);
-                //console.log(tree);
-                //console.log(indexOfTarget);
-                //setTipText("You swapped " + tree[indexOfTarget].contents + " and " + tree[indexOfDropped].contents);//We need to change something in this Heap component so page refreshes and we see reult of swappign nodes
                 needToReorder(indexOfTarget)//was index of dropped but they've swapped now
-                console.log("tree len: " + tree.length + " ele len: " + elementList.length);
-                if (isTreeComplete() && tree.length-1 === elementList.length) {
+                console.log("ar index: " + arIndex + " ele len: " + elementList.length);
+                if (isTreeComplete() && arIndex === elementList.length) {
                     setMode("deletion");//not updating soon neough, uh oh! might need to move :/
                     setTopArray([,]);
-                    setTipText("Click the node that should be deleted from the heap and added to the new ordered array");
-                    console.log("deletion time babyyyyy");
+                    setTipText("Click the node that should be deleted from the heap and added to the ordered array.");
+                    console.log("deletion time");
                     console.log("just set mode in drop: " + mode);
                 }
             }
@@ -254,28 +255,31 @@ function Heap() {
                     newRoot.ref = drop;
                     newTree[1] = newRoot;
                     //this is causing issue! trying to access when out of bounds!
-                    if (tree.length == 3) {
+                    if (tree.length === 3) {
                         if (newRoot.contents < tree[2].contents) {
-                            setTipText("That's correct! Now the root needs sifting down the heap to maintiain the following property: " +
-                                "'A child node cannot be larger than a parent node'" +
-                                "\n Drag the largest child of the root to replace " + tree[1].contents);
+                            setTipText("That's right!\nNow the root needs sifting down the heap to maintiain the following property: " +
+                                "\n~A child node cannot be larger than a parent node~" +
+                                "\nDrag the largest child of the root to replace " + tree[1].contents + ".");
                         }
                     }
                     else if (newRoot.contents < tree[2].contents || newRoot.contents < tree[3].contents) {
-                        setTipText("That's correct! Now the root needs sifting down the heap to maintiain the following property: " +
-                            "'A child node cannot be larger than a parent node'" +
-                            "\n Drag the largest child of the root to replace " + tree[1].contents);
+                        setTipText("That's right!\nNow the root needs sifting down the heap to maintiain the following property: " +
+                            "\n~A child node cannot be larger than a parent node~" +
+                            "\nDrag the largest child of the root to replace " + tree[1].contents + ".");
                     }
                     else {
-                        setTipText("That's correct! Also, the new root is not smaller than its children so the heap does not need sifting");
+                        setTipText("That's right! \nAlso, the new root is not smaller than its children so the heap does not need sifting.\nClick the node that should be deleted next.");
                     }
                     newTree.pop();
+                    if (newTree.length === 2) {
+                        setTipText("That's right! \nNow click the node that should be deleted from the heap and added to the sorted array.");
+                    }
                     setTree(newTree);
                 //delete last node from heap
                 //make left/right child a drop?
                 }
                 else {
-                    setTipText("That's not the correct node. Are you choosing the last element in the heap?");
+                    setTipText("That's not quite right. \nAre you choosing the node in the last position of the heap?");
                 }
             }
             //We're sifitng root down
@@ -293,14 +297,12 @@ function Heap() {
                     if (sibling < tree.length) {
                         //and sibling's contents are greater than the node the user dragged, we need to correct them
                         if (tree[sibling].contents > tree[droppedIndex].contents) {
-                            setTipText("That isn't the correct node, try again.");
+                            setTipText("That 's not quite right. \nDid you choose the root's largest child?");
                             return;
                         }
 
                     }
                     //User chose the correct node to swap
-                    console.log("yas hunty");
-
                     let swapNodeDropped = tree[droppedIndex];
                     let swapNodeTarget = tree[indexOfTarget];
 
@@ -309,13 +311,13 @@ function Heap() {
                     newTree[droppedIndex].ref = undefined;
                     newTree[indexOfTarget] = swapNodeDropped;
                     setTree(newTree);
-                    setTipText("Yaaas.");
+                    setTipText("That's right! \nNow click the node that should be deleted from the heap and added to the sorted array.");
                     //console.log(droppedIndex);
                     //console.log(indexOfTarget);
                     needToReorder(droppedIndex);
                 }
                 else {
-                    setTipText("That's not a child of the node you're trying to swap. Try again.")
+                    setTipText("That's not quite right. \nAre you choosing a child of the node you're trying to swap?")
                     //ToDo: Seems to give this even when not true, fix!
 
                     //Also! make sure user can keep deleting and sifting till the end, broken atm 
@@ -417,12 +419,13 @@ function Heap() {
         //console.log(mode);
         if (mode === "insertion") {
             if (index === 1) {
-                setTipText("Click stuff innit");
+                setTipText("Click the position in the heap where the next element from the array should go.");
                 return false;//Only one node in tree so no need to reorder
             }
             //can i get out of bounds below?? check if this code needs error checking 
             else if (tree[index].contents > tree[Math.floor(index / 2)].contents) {
-                setTipText("Looks like you need to switch nodes to hold the property: \n'A child node cannot be larger than a parent node'");
+                setTipText("That's right! \nNow the heap needs reordering to hold the property: \n~A child node cannot be larger than a parent node~." +
+                    "\nDrag the invalid child node to the position of its parent to swap the two.");
                 let newTree = tree;
                 newTree[Math.floor(index / 2)].ref = drop;
                 setTree(newTree);
@@ -430,7 +433,7 @@ function Heap() {
                 return true;
             }
             else {
-                setTipText("Click stuff innit");//tell them to click where next thing should go unless array all in tree now, then tell them to delete a node?
+                setTipText("Click the position in the heap where the next element from the array should go.");//tell them to click where next thing should go unless array all in tree now, then tell them to delete a node?
                 return false;
             }
         }
@@ -463,7 +466,7 @@ function Heap() {
             setTopArray(newArray);
             setArIndex(arIndex + 1);
 
-            setTipText("Click where you think the next element in the array should go");
+            setTipText("Click the position in the heap where the next element from the array should go.");
             
             //Need to check that the child is less than parent (so it's a valid max heap);
             //console.log(tree);
@@ -471,16 +474,16 @@ function Heap() {
 
         }
         else if (!isTreeComplete()) {
-            setTipText("Not quite. The heap needs reordering so no child is greater than it's parent.");
+            setTipText("That's not quite right. \nCan you see any child nodes greater than their parents?\nDrag the child to the position of the parent to swap them.");
         }
         else {
-            setTipText("Not quite. Are you choosing the next available position in the heap correctly?");
+            setTipText("That's not quite right. \nAre you choosing the next available position in the heap?");
         }
         if (isTreeComplete() && arIndex === elementList.length - 1) {
             setMode("deletion");//not updating soon neough, uh oh! might need to move :/
             setTopArray([,]);
-            setTipText("Click the node that should be deleted from the heap and added to the new ordered array");
-            console.log("deletion time baby");
+            setTipText("Click the node that should be deleted from the heap and added to the new ordered array.");
+            console.log("deletion time");
            // console.log("mode in  clikc: " + mode);
         }
     }
@@ -512,13 +515,11 @@ function Heap() {
             };
             //newTree[1].ref = drag
             setTree(newTree);
-            if (true) {
-                setTipText("Drag the correct node to take the place of the old root node.");
-            }
-            //set tree root to nothing or smthing?
+            //console.log(tree.length);
+            setTipText("That's right! \nDrag the correct node to take the place of the old root node.");
         }
         else {
-            setTipText("That is not the element that should be deleted next, try again");
+            setTipText("That's not quite right. \nWhich node always gets deleted in a heap?");
         }
     }
     //need to empty array as tree gets filled?
@@ -677,6 +678,7 @@ function Heap() {
                     <h1>Well Done!!!!</h1>
                     <div className="stage">
                         <Confetti recycle={false} numberOfPieces="100" />
+                        <button><a className="homeButton" href="/">Home</a></button>
                     </div>
                 </>
             );

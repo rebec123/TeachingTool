@@ -1,14 +1,43 @@
 import React, { useState, useEffect } from "react";
+import {
+    BrowserRouter as Router,
+    Navigate
+} from "react-router-dom";
 //import Element from "../Components/Element";
 import { useDrop, useDrag } from "react-dnd";
 //import { toBeVisible } from "../../node_modules/@testing-library/jest-dom/dist/to-be-visible";
 import cloneDeep from 'lodash/cloneDeep';//Need deep clones to ensure each split array can be rearranged w/o effecting all arrays
 import Confetti from 'react-confetti'
 
-/*const algorithm = ["mergeSort(A)", "If array length > 1", "Split the array in to two halves: S1 and S2",
-    "call mergeSort(S1)", "call mergeSort(S2)", "call merge(S1, S2, A)", "\n", "merge(S1, S2, A)",
-    "i = 0, j = 0, k = 0", "while (i < p and j < q)", "if S1[i] <= S2[j]", "A[k] = S1[i]", "i = i + 1", "else", "A[k] = S2[j]", "j = j + 1",
-    "k = k + 1", "if i = p", "Copy S2[j,…, q - 1] to A", "else", "Copy S1[i,…, p - 1] to A"];*/
+/*{
+        id: 1,
+        contents: 6
+    },
+
+    {
+        id: 2,
+        contents: 5
+    },
+
+    {
+        id: 3,
+        contents: 3
+    },
+
+    {
+        id: 4,
+        contents: 1
+    },
+
+    {
+        id: 5,
+        contents: 8
+    },
+
+    {
+        id: 6,
+        contents: 7
+    }*/
 const elementList = [
     {
         id: 1,
@@ -222,7 +251,8 @@ function Merge() {
     //GOOD TO KNOW: page is re-rendered everytime you set state
     //do not change state INSIDE render, because you will get stuck in endless loop and hang!
     //const [title, setTitle] = useState("Merge Sort");
-    const [tipText, setTipText] = useState("Click 'split' to start splitting the array in half.");
+    const [redirect, setRedirect] = useState(null);
+    const [tipText, setTipText] = useState("Click 'split' to start splitting the arrays in half.");
     const [mode, setMode] = useState("splitting");//ToDo:change to merging when in merge mode, this should disable split buttons until meregd??
     const [visibleDivs, setVisibleDivs] = useState([1]);
     const [arrays, setArrays] = useState(divContents());
@@ -262,7 +292,7 @@ function Merge() {
         setArrays(oldArrays.map(
             ar => ((ar.index !== parent && ar.index !== child1 && ar.index !== child2) ? Object.assign(ar, { style: "ar-el-grey" }) : ar)
         ));
-        setTipText("Merge the two highlighted arrays into one. Drag the elements into the new array in order of lowest to highest.")
+        setTipText("Merge the two highlighted arrays into one. \nDrag the elements into the new array in order of lowest to highest.")
         /*setArrays(oldArrays.map(
             ar => ((ar.index === parent) ? Object.assign(ar, { contents: newContents }) : ar)
         ));*/
@@ -329,7 +359,7 @@ function Merge() {
             allElements = false;
         }
         if (!allElements) {
-            setTipText("That's not quite right. Make sure you have included all the elements from the child arrays and you aren't adding any elements twice.");//ToDo: change to helper text instead of title
+            setTipText("That's not quite right.\nHave you included all the elements from the child arrays? \nAre you adding each elemnt only once?");//ToDo: change to helper text instead of title
             setMergeArray([]);
             return;
         }
@@ -352,7 +382,7 @@ function Merge() {
                 setDone(true);
             }
             else {
-                setTipText("That's right! Continue splitting the arrays that have not yet been split.");//ToDo: change to helper text instead of title
+                setTipText("That's right! \nContinue splitting the arrays that have not yet been split.");//ToDo: change to helper text instead of title
             }
             //Resetting merge state values
             setDivToMerge(0);
@@ -368,7 +398,7 @@ function Merge() {
             isMergePossible(Math.floor(div / 2));
         }
         else {
-            setTipText("That's not quite right. Make sure you are ordering the elements from lowest to highest.");//ToDo: change to helper text instead of title
+            setTipText("That's not quite right. \nDid you order the elements from lowest to highest?");//ToDo: change to helper text instead of title
             setMergeArray([]);
         }
     }
@@ -588,6 +618,7 @@ function Merge() {
         );
     }
 
+
     const pageContents = () => {
         if (done) {//chanhe back to "done" after testing
             //can change confetti colours!
@@ -596,7 +627,8 @@ function Merge() {
                 <>
                     <h1>Well Done!!!!</h1>
                     <div className="stage">
-                        <Confetti recycle={false} numberOfPieces="100"/>
+                        <Confetti recycle={false} numberOfPieces="100" />
+                        <button><a className="homeButton" href="/">Home</a></button>
                     </div>
                 </>
             );

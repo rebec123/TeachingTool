@@ -16,7 +16,8 @@ import Heap from "./Pages/Heap";
 const Algorithm = Object.freeze({
     None: Symbol("none"),
     Merge: Symbol("merge"),
-    Heap: Symbol("heap")
+    Heap: Symbol("heap"),
+    About: Symbol("about")
 })
 
 const ContentType = Object.freeze({
@@ -34,15 +35,18 @@ function Menu() {
     const onMergeClick = () => {
         //this.setState({ madeAlgoChoice: true, algoChoice: Algorithm.Merge }, () => { console.log(this.madeAlgoChoice) });
         setAlgoChoice(Algorithm.Merge);
+        setRedirect("/Merge");
     }
 
     const onHeapClick = () => {
         //this.setState({ algoChoice: Algorithm.Heap, madeAlgoChoice: true }, () => { console.log(this.madeAlgoChoice) });
         setAlgoChoice(Algorithm.Heap);
+        setRedirect("/Heap");
     }
 
     const onAboutClick = () => {
-        setRedirect({ redirect: "/About" });
+        setAlgoChoice(Algorithm.About);
+        setRedirect("/About");
 
     }
 
@@ -51,7 +55,7 @@ function Menu() {
 
     }
 
-    const onEasyClick = () => {
+    /*const onEasyClick = () => {
         setContentChoice(ContentType.Easy);
         //console.log(this.algoChoice);
         if (algoChoice === Algorithm.Merge) {
@@ -60,7 +64,7 @@ function Menu() {
         else if (algoChoice === Algorithm.Heap) {
             setRedirect("/Heap");
         }
-    }
+    }*/
 
     const onHardClick = () => {
         setContentChoice(ContentType.Hard);
@@ -71,13 +75,15 @@ function Menu() {
         if (algoChoice === Algorithm.None) {
             return (
                 <div>
-                    <button onClick={() => { onMergeClick() }} >
+                    <button className="btn-navy" onClick={() => { onMergeClick() }} >
                         Merge Sort
                     </button>
-                    <button onClick={() => { onHeapClick() }}>
+                    <br/>
+                    <button className="btn-navy" onClick={() => { onHeapClick() }}>
                         Heap Sort
                     </button>
-                    <button onClick={() => { onAboutClick() }}>
+                    <br />
+                    <button className="btn-navy" onClick={() => { onAboutClick() }}>
                         About
                     </button>
 
@@ -87,7 +93,7 @@ function Menu() {
         return;
     }
 
-    const selection2 = () => {
+   /* const selection2 = () => {
         if (algoChoice !== Algorithm.None) {
             return (
                 <div>
@@ -107,7 +113,7 @@ function Menu() {
         else {
             return;
         }
-    }
+    }*/
 
     const redirectPage = () => {
         let result = [];
@@ -121,11 +127,15 @@ function Menu() {
     //Do not forget brackets when calling functions in return!!!
     return (
         <>
-            <h1>Hello!</h1>
+            <div className="flex-stage">
+            <div className="header">
+                <h1 className="title-ppt-style">Practice Sorting Algorithms</h1>
+            </div>
+            </div>
             <div>
                 {redirectPage()}
                 {selection1()}
-                {selection2()}
+                {/*selection2()*/}
 
             </div>
 
