@@ -1,6 +1,15 @@
 :root {
-    --button-height: 30px;
+    --button-height: 37px;
+    --button-width: 85px;
     --circle-height: 65px;
+    --merge-dark-colour: #6D488E;
+    --merge-darkest-colour: #49305F;
+    --merge-light-colour: #E9E0F0;
+    --merge-attention-colour: #F02D3A;
+    --heap-dark-colour: #F07605;
+    --heap-darkest-colour: #B45904;
+    --heap-light-colour: #FDDFC3;
+    --light-grey: #E8E8E8;
 }
 .App {
     text-align: center;
@@ -55,8 +64,37 @@
 
 .btn-split, .btn-merge {
     height: var(--button-height);
-    border: 1px solid black;
+    width: var(--button-width);
+    background-color: var(--merge-dark-colour);
+    color: white;
+    font-size: 20px;
+    font-weight: 100;
+    border-radius: 12px;
+    border: 2px solid white;
+    padding: 0px;
+    margin-top: 5px;
 }
+
+.btn-split:hover,
+.btn-split:focus,
+.btn-merge:hover,
+.bt-merge:focus {
+   background-color: var(--merge-darkest-colour);
+}
+
+.btn-split-disabled {
+    height: var(--button-height);
+    width: var(--button-width);
+    background-color: var(--merge-light-colour);
+    color: white;
+    font-size: 20px;
+    font-weight: 100;
+    border-radius: 12px;
+    border: 2px solid white;
+    padding: 0px;
+    margin-top: 5px;
+}
+
 
 .size-of-button {
     height: var(--button-height);
@@ -72,13 +110,12 @@
 
 .ar-el-grey {
     font-size: 2em;
-    color: grey;
-    border: 3px solid grey;
+    color: var(--light-grey);
+    border: 3px solid var(--light-grey);
     width: 50px;
 }
 
 .array, .array-split {
-    border: 3px solid white;
     width: 99%;
     height: auto;
     margin: auto;
@@ -105,9 +142,9 @@
 }
 
 .heap-container {
-    border: 3px solid orange;
     width: 70%;
     height: 100%;
+    margin-top: 13px
 }
 
 .heap-div {
@@ -120,7 +157,6 @@
     z-index: 2;
 }
 
-
 .flex-container {
     border: 0px solid orange;
     width: 100%;
@@ -131,25 +167,33 @@
 }
 
 .heap-text-container {
-    border: 3px solid orange;
+    font-size: 20px;
     width: 30%;
     height: 100%;
     white-space: pre-wrap;
     text-align: left;
+    background-color: var(--heap-light-colour);
+    padding: 15px;
+    margin-right: 20px;
+    margin-top: 10px;
 }
 
 .merge-container {
-    border: 3px solid blue;
+    border: 3px solid white;
     width: 70%;
     height: 100%;
 }
 
 .merge-text-container {
-    border: 3px solid blue;
+    font-size:20px;
     width: 30%;
     height: 100%;
     white-space: pre-wrap;
-    text-align:left;
+    text-align: left;
+    background-color: var(--merge-light-colour);
+    padding:15px;
+    margin-right: 20px;
+    margin-top:10px;
 }
 
 .ar-el-bare {
@@ -207,7 +251,7 @@
 }
 
 .element-target {
-    border: 3px solid red;
+    border: 3px solid var(--merge-attention-colour);
     width: 99%;
     height: 47px;
     margin-top: 10px;
@@ -217,12 +261,12 @@
 }
 
 .homeButton{
-    color: black;
+    color: white;
     text-decoration:none;
 }
 
 .header {
-    width: 70%;
+    width: 100%;
     height: auto;
     background-color: #00502F;
     padding: 2px;
@@ -238,18 +282,80 @@
     font-size:40px;
 }
 
-.btn-navy {
-    width: 10%;
+.header-small {
+    width: 100%;
+    height: auto;
+    background-color: #00502F;
+    padding: 2px;
+    align-self: center;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 10px;
+}
+
+.title-ppt-style-small {
+    color: white;
+    font-weight: normal;
+    font-size: 30px;
+}
+
+.well-done-merge {
+    font-weight: normal;
+    font-size: 30px;
+    background-color: var(--merge-light-colour);
+    width: 30%;
+    padding:20px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.well-done-heap {
+    font-weight: normal;
+    font-size: 30px;
+    background-color: var(--heap-light-colour);
+    width: 30%;
+    padding: 20px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.btn-menu {
+    width: 15%;
     background-color: #000099;
     color: white;
     font-size: 25px;
     font-weight: 100;
     border-radius: 12px;
-    border:2px solid white;
-    padding: 10px;
+    border: 2px solid white;
+    padding: 15px;
+    margin-top: 30px;
 }
 
-    .btn-navy:hover,
-    .btn-navy:focus {
-        background-color: #00004A;
-    }
+.btn-menu:hover,
+.btn-menu:focus {
+    background-color: #00004A;
+}
+
+.btn-back {
+    width: 15%;
+    background-color: #000099;
+    color: white;
+    font-size: 20px;
+    font-weight: 100;
+    border-radius: 12px;
+    border: 2px solid white;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+.btn-back:hover,
+.btn-back:focus {
+    background-color: #00004A;
+}
+
+.abt-desc {
+    font-size: 20px;
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+}

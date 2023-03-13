@@ -75,15 +75,15 @@ function Menu() {
         if (algoChoice === Algorithm.None) {
             return (
                 <div>
-                    <button className="btn-navy" onClick={() => { onMergeClick() }} >
+                    <button className="btn-menu" onClick={() => { onMergeClick() }} >
                         Merge Sort
                     </button>
                     <br/>
-                    <button className="btn-navy" onClick={() => { onHeapClick() }}>
+                    <button className="btn-menu" onClick={() => { onHeapClick() }}>
                         Heap Sort
                     </button>
                     <br />
-                    <button className="btn-navy" onClick={() => { onAboutClick() }}>
+                    <button className="btn-menu" onClick={() => { onAboutClick() }}>
                         About
                     </button>
 

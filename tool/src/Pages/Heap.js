@@ -675,10 +675,15 @@ function Heap() {
         if (done) {
             return (
                 <>
-                    <h1>Well Done!!!!</h1>
+                    <div className="header-small">
+                        <h1 className="title-ppt-style-small">Heap Sort</h1>
+                    </div>
+                    <h2 className="well-done-heap">Well Done!</h2>
                     <div className="stage">
                         <Confetti recycle={false} numberOfPieces="100" />
-                        <button><a className="homeButton" href="/">Home</a></button>
+                        <a className="homeButton" href="/">
+                            <button className="btn-back">Home</button>
+                        </a>
                     </div>
                 </>
             );
@@ -686,7 +691,9 @@ function Heap() {
         else {
             return (
                 <>
-                    <h1>Heap Sort</h1>
+                    <div className="header-small">
+                        <h1 className="title-ppt-style-small">Heap Sort</h1>
+                    </div>
                     <div className="stage">
                         {array()}
                         {heapAndTips()}

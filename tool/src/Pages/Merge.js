@@ -409,7 +409,7 @@ function Merge() {
         //console.log("merged? " + arrays[div].merged);
         if (!visibleDivs.includes(div * 2) && !arrays[div].merged) {
             if (divToMerge !== 0) {
-                addButton = <button className="btn-split" onClick={() => onSplitClick(div)} disabled>split</button>;
+                addButton = <button className="btn-split-disabled" onClick={() => onSplitClick(div)} disabled>split</button>;
             }
             else {
                 addButton = <button className="btn-split" onClick={() => onSplitClick(div)} >split</button>;
@@ -625,10 +625,15 @@ function Merge() {
             //could adjust amount of confetti based on user's score
             return (
                 <>
-                    <h1>Well Done!!!!</h1>
+                    <div className="header-small">
+                        <h1 className="title-ppt-style-small">Merge Sort</h1>
+                    </div>
+                    <h2 className="well-done-merge">Well Done!</h2>
                     <div className="stage">
                         <Confetti recycle={false} numberOfPieces="100" />
-                        <button><a className="homeButton" href="/">Home</a></button>
+                        <a className="homeButton" href="/">
+                            <button className="btn-back">Home</button>
+                        </a>
                     </div>
                 </>
             );
@@ -636,7 +641,9 @@ function Merge() {
         else {
             return (
                 <>
-                    <h1>Merge Sort</h1>
+                    <div className="header-small">
+                        <h1 className="title-ppt-style-small">Merge Sort</h1>
+                    </div>
                     <div className="flex-stage">
                         <div className="merge-container">
                             {row0()}
