@@ -1,12 +1,13 @@
 :root {
     --button-height: 37px;
     --button-width: 85px;
-    --circle-height: 65px;
+    --circle-diameter: 65px;
+    --element-font-size: 35px;
     --merge-dark-colour: #6D488E;
     --merge-darkest-colour: #49305F;
     --merge-light-colour: #E9E0F0;
     --merge-attention-colour: #F02D3A;
-    --heap-dark-colour: #F07605;
+    --heap-dark-colour: #FB9332;
     --heap-darkest-colour: #B45904;
     --heap-light-colour: #FDDFC3;
     --light-grey: #E8E8E8;
@@ -52,9 +53,9 @@
 }
 
 .stage {
-    border: 3px dotted white;
     width: 100%;
     height: 100%;
+    border:0px;
 }
 
 
@@ -102,17 +103,35 @@
 }
 
 .ar-el {
-    font-size: 2em;
+    font-size: var(--element-font-size);
     color: black;
     border: 3px solid black;
     width: 50px;
+    height: 45px;
+    line-height: 45px;
 }
 
 .ar-el-grey {
-    font-size: 2em;
+    font-size: var(--element-font-size);
     color: var(--light-grey);
     border: 3px solid var(--light-grey);
     width: 50px;
+    height: 45px;
+}
+
+.ar-el-bare {
+    font-size: var(--element-font-size);
+    width: 50px;
+    background: transparent;
+}
+
+.ar-el-container {
+    color: black;
+    border: 3px solid black;
+    width: 50px;
+    height: 45px;
+    margin-bottom: 20px;
+    margin-top: 7px;
 }
 
 .array, .array-split {
@@ -136,7 +155,7 @@
 }
 
 .under-ar {
-    border: 3px solid white;
+    border: 0px solid white;
     display: flex;
     height:100%;
 }
@@ -144,13 +163,12 @@
 .heap-container {
     width: 70%;
     height: 100%;
-    margin-top: 13px
 }
 
 .heap-div {
-    border: 0px solid orange;
     width: 100%;
-    height: var(--circle-height);
+    height: var(--circle-diameter);
+    line-height: var(--circle-diameter);
     justify-content: center;
     align-items: center;
     display: flex;
@@ -158,9 +176,8 @@
 }
 
 .flex-container {
-    border: 0px solid orange;
     width: 100%;
-    height: var(--circle-height);
+    height: var(--circle-diameter);
     justify-content: center;
     align-items: center;
     display: flex;
@@ -179,7 +196,6 @@
 }
 
 .merge-container {
-    border: 3px solid white;
     width: 70%;
     height: 100%;
 }
@@ -196,35 +212,62 @@
     margin-top:10px;
 }
 
-.ar-el-bare {
-    font-size: 35px;
-    width: 50px;
-    background: transparent;
-}
-.ar-el-container {
-    color: black;
-    border: 3px solid black;
-    width: 50px;
-    height: 45px;
-}
-
 .circle {
     display: flex;
-    width: var(--circle-height);
-    height: var(--circle-height);
+    width: var(--circle-diameter);
+    height: var(--circle-diameter);
+    border-radius: 50%;
+    border: 3px solid black;
+    line-height: var(--circle-diameter);
+    justify-content: center;
+    vertical-align: middle;
+    background-color:var(--heap-light-colour);
+    font-size: 35px;
+    z-index: 2;
+}
+
+.btn-circle-empty {
+    display: flex;
+    width: var(--circle-diameter);
+    height: var(--circle-diameter);
+    line-height: var(--circle-diameter);
     border-radius: 50%;
     border: 3px solid black;
     justify-content: center;
     vertical-align: middle;
+    padding: 0px;
+    background-color: var(--heap-dark-colour);
+}
+
+.btn-circle-empty:hover,
+.btn-circle-empty:focus {
+    background-color: var(--heap-darkest-colour);
+}
+
+.btn-circle {
+    display: flex;
+    width: var(--circle-diameter);
+    height: var(--circle-diameter);
+    border-radius: 50%;
+    border: 3px solid black;
+    padding: 10px;
+    text-align: center;
+    vertical-align: middle;
+    background-color: var(--heap-dark-colour);
     font-size: 35px;
     z-index: 2;
+}
+
+.btn-circle:hover,
+.btn-circle:focus {
+    background-color: var(--heap-darkest-colour);
 }
 
 .line-left {
     background: linear-gradient(to top left, rgba(0,0,0,0) 0%, rgba(0,0,0,0) calc(50% - 1.8px), rgba(0,0,0,1) 50%, rgba(0,0,0,0) calc(50% + 1.8px), rgba(0,0,0,0) 100%);
     z-index: 1;
-    width:100%;
-    height:100%;
+    width: 100%;
+    height: 100%;
 }
 
 .line-right {
@@ -232,17 +275,6 @@
     z-index: 1;
     width: 100%;
     height: 100%;
-}
-
-.circle-grey {
-    display: flex;
-    width: var(--circle-height);
-    height: var(--circle-height);
-    border-radius: 50%;
-    border: 3px solid grey;
-    justify-content: center;
-    vertical-align: middle;
-    font-size: 2em;
 }
 
 .array-and-div {

@@ -387,6 +387,7 @@ function Heap() {
             <>
                 <div className="under-ar">
                     <div className="heap-container">
+                        {array()}
                         {displayHeap()}
                     </div>
                     <div className="heap-text-container">
@@ -536,7 +537,7 @@ function Heap() {
             //deletion mode (getting ordered array)
             //console.log(tree[i].ref);//delete root then drag node that should take its place? then drag around
             result.push(
-                <button className="circle" onClick={() => onNodeClickD(i)} ref={tree[i].ref }>
+                <button className="btn-circle" onClick={() => onNodeClickD(i)} ref={tree[i].ref }>
                     <Element contents={tree[i].contents} id={tree[i].id} />
                 </button>)
         }
@@ -562,12 +563,12 @@ function Heap() {
             }
             //If 1 has no content, we want to display it as a button (can't lump it in with children like below because root has no children)
             else if (i === 1) {
-                result.push(<button className="circle-grey" onClick={() => onNodeClickI(i)}></button>)
+                result.push(<button className="btn-circle-empty" onClick={() => onNodeClickI(i)}></button>)
             }
             //If the node's parent is showing, display node as grey button
             else if (i / 2 >= 1) {
                 if (tree[Math.floor(i / 2)].contents) {
-                    result.push(<button className="circle-grey" onClick={() => onNodeClickI(i)}></button>)
+                    result.push(<button className="btn-circle-empty" onClick={() => onNodeClickI(i)}></button>)
                 }
             }
         }
@@ -695,7 +696,6 @@ function Heap() {
                         <h1 className="title-ppt-style-small">Heap Sort</h1>
                     </div>
                     <div className="stage">
-                        {array()}
                         {heapAndTips()}
 
                     </div>
