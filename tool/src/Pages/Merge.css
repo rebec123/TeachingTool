@@ -1,0 +1,167 @@
+﻿:root {
+    --button-height: 37px;
+    --button-width: 85px;
+    --element-font-size: 35px;
+    --merge-dark-colour: #6D488E;
+    --merge-darkest-colour: #49305F;
+    --merge-light-colour: #E9E0F0;
+    --merge-attention-colour: #F02D3A;
+    --light-grey: #E8E8E8;
+}
+
+/*Regular arrays*/
+.array, .array-split {
+    width: 99%;
+    height: auto;
+    margin: auto;
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/*The div used to hold the empty array div when arrays being merged*/
+.array-and-div {
+    border: 3px solid white;
+    width: 100%;
+}
+
+/*Array element*/
+.ar-el {
+    font-size: var(--element-font-size);
+    color: black;
+    border: 3px solid black;
+    width: 50px;
+    height: 45px;
+    line-height: 45px;
+}
+
+/*Array elements greyed out, to bring focus when merging*/
+.ar-el-grey {
+    font-size: var(--element-font-size);
+    color: var(--light-grey);
+    border: 3px solid var(--light-grey);
+    width: 50px;
+    height: 45px;
+}
+
+/*Splitting and merging buttons*/
+.btn-split, .btn-merge {
+    height: var(--button-height);
+    width: var(--button-width);
+    background-color: var(--merge-dark-colour);
+    color: white;
+    font-size: 20px;
+    font-weight: 100;
+    border-radius: 12px;
+    border: 2px solid white;
+    padding: 0px;
+    margin-top: 5px;
+}
+
+    .btn-split:hover,
+    .btn-split:focus,
+    .btn-merge:hover,
+    .bt-merge:focus {
+        background-color: var(--merge-darkest-colour);
+    }
+
+.btn-split-disabled {
+    height: var(--button-height);
+    width: var(--button-width);
+    background-color: var(--merge-light-colour);
+    color: white;
+    font-size: 20px;
+    font-weight: 100;
+    border-radius: 12px;
+    border: 2px solid white;
+    padding: 0px;
+    margin-top: 5px;
+}
+
+/*Empty space the size of split/merge buttons to keep other items in place*/
+.size-of-button {
+    height: var(--button-height);
+    border: 1px solid white;
+}
+
+/*The array user drags elements to when merging*/
+.element-target {
+    border: 3px solid var(--merge-attention-colour);
+    width: 99%;
+    height: 47px;
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+/*Div containing whole merge visualisation*/
+.merge-container {
+    width: 70%;
+    height: 100%;
+}
+
+/*Div for the feedback*/
+.merge-text-container {
+    font-size: 20px;
+    width: 30%;
+    height: 100%;
+    white-space: pre-wrap;
+    text-align: left;
+    background-color: var(--merge-light-colour);
+    padding: 15px;
+    margin-right: 20px;
+    margin-top: 10px;
+}
+
+/*Styling of text on end screen*/
+.end-screen-merge {
+    white-space: pre-wrap;
+    font-weight: normal;
+    font-size: 30px;
+    background-color: var(--merge-light-colour);
+    width: 30%;
+    padding: 20px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/*Extra info description div*/
+.info-desc-merge {
+    text-align: left;
+    white-space: pre-wrap;
+    font-size: 21px;
+    border: 5px solid var(--merge-light-colour);
+    padding: 15px;
+    margin-top: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+/*Extra info pseudo code div*/
+.info-pseudo-merge {
+    text-align: left;
+    white-space: pre-wrap;
+    font-size: 21px;
+    width: 60%;
+    border: 5px solid var(--merge-light-colour);
+    padding: 15px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: 20px;
+    float: left;
+}
+
+/*Extra info time complexity div*/
+.info-time-merge {
+    text-align: left;
+    white-space: pre-wrap;
+    width: 36%;
+    font-size: 21px;
+    border: 5px solid var(--merge-light-colour);
+    padding: 15px;
+    margin-top: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+    float: left;
+}

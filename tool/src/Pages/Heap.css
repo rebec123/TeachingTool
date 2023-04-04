@@ -1,0 +1,202 @@
+﻿:root {
+    --circle-diameter: 65px;
+    --element-font-size: 35px;
+    --heap-dark-colour: #FB9332;
+    --heap-darkest-colour: #B45904;
+    --heap-light-colour: #FDDFC3;
+}
+
+/*An array element with no container*/
+.ar-el-bare {
+    font-size: var(--element-font-size);
+    width: 50px;
+    background: transparent;
+}
+
+/*The box containing an array element*/
+.ar-el-container {
+    color: black;
+    border: 3px solid black;
+    width: 50px;
+    height: 45px;
+    margin-bottom: 20px;
+    margin-top: 7px;
+}
+
+/*under an array*/
+.under-ar {
+    border: 0px solid white;
+    display: flex;
+    height: 100%;
+}
+
+/*The array being sorted*/
+.array {
+    border: 3px solid white;
+    width: 99%;
+    height: auto;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/*Div containing visualisation*/
+.heap-container {
+    width: 70%;
+    height: 100%;
+}
+
+/*Div that contains nodes*/
+.heap-div {
+    width: 100%;
+    height: var(--circle-diameter);
+    line-height: var(--circle-diameter);
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    z-index: 2;
+}
+
+/*Div containing feedback*/
+.heap-text-container {
+    font-size: 20px;
+    width: 30%;
+    height: 100%;
+    white-space: pre-wrap;
+    text-align: left;
+    background-color: var(--heap-light-colour);
+    padding: 15px;
+    margin-right: 20px;
+    margin-top: 10px;
+}
+
+/*The container that nodes are stored in*/
+.flex-container {
+    width: 100%;
+    height: var(--circle-diameter);
+    justify-content: center;
+    align-items: center;
+    display: flex;
+}
+
+/*Non-clickable nodes*/
+.circle {
+    display: flex;
+    width: var(--circle-diameter);
+    height: var(--circle-diameter);
+    border-radius: 50%;
+    border: 3px solid black;
+    line-height: var(--circle-diameter);
+    justify-content: center;
+    vertical-align: middle;
+    background-color: var(--heap-light-colour);
+    font-size: 35px;
+    z-index: 2;
+}
+
+/*A node when it is empty and is clickable (insertion mode)*/
+.btn-circle-empty {
+    display: flex;
+    width: var(--circle-diameter);
+    height: var(--circle-diameter);
+    line-height: var(--circle-diameter);
+    border-radius: 50%;
+    border: 3px solid black;
+    justify-content: center;
+    vertical-align: middle;
+    padding: 0px;
+    background-color: var(--heap-dark-colour);
+}
+
+    .btn-circle-empty:hover,
+    .btn-circle-empty:focus {
+        background-color: var(--heap-darkest-colour);
+    }
+
+/*A node has a number in it and is clickable (deletion mode)*/
+.btn-circle {
+    display: flex;
+    width: var(--circle-diameter);
+    height: var(--circle-diameter);
+    border-radius: 50%;
+    border: 3px solid black;
+    padding: 10px;
+    text-align: center;
+    vertical-align: middle;
+    background-color: var(--heap-dark-colour);
+    font-size: 35px;
+    z-index: 2;
+}
+
+    .btn-circle:hover,
+    .btn-circle:focus {
+        background-color: var(--heap-darkest-colour);
+    }
+
+/*Line connecting parent and left children in heap visualisation*/
+.line-left {
+    background: linear-gradient(to top left, rgba(0,0,0,0) 0%, rgba(0,0,0,0) calc(50% - 1.8px), rgba(0,0,0,1) 50%, rgba(0,0,0,0) calc(50% + 1.8px), rgba(0,0,0,0) 100%);
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+}
+
+/*Line connecting parent and right children in heap visualisation*/
+.line-right {
+    background: linear-gradient(to top right, rgba(0,0,0,0) 0%, rgba(0,0,0,0) calc(50% - 1.8px), rgba(0,0,0,1) 50%, rgba(0,0,0,0) calc(50% + 1.8px), rgba(0,0,0,0) 100%);
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+}
+
+/*Styling of text on end screen*/
+.end-screen-heap {
+    font-weight: normal;
+    font-size: 30px;
+    background-color: var(--heap-light-colour);
+    width: 30%;
+    padding: 20px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/*Extra info description div*/
+.info-desc {
+    text-align: left;
+    white-space: pre-wrap;
+    font-size: 21px;
+    border: 5px solid var(--heap-light-colour);
+    padding: 15px;
+    margin-top: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+/*Extra info pseudo code div*/
+.info-pseudo {
+    text-align: left;
+    white-space: pre-wrap;
+    font-size: 21px;
+    width: 60%;
+    border:5px solid var(--heap-light-colour);
+    padding: 15px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: 20px;
+    float: left;
+}
+
+/*Extra info time complexity div*/
+.info-time {
+    text-align: left;
+    white-space: pre-wrap;
+    width: 36%;
+    font-size: 21px;
+    border: 5px solid var(--heap-light-colour);
+    padding: 15px;
+    margin-top: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+    float: left;
+}

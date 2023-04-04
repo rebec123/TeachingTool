@@ -1,7 +1,8 @@
 import SideMenu from '../Components/SideMenu';
+import "./Heap.css";
 
+//A page of additional information about heap sort
 function HeapInfo() {
-    //add button to switch to other algo info?
     let information = "Heap sort uses a heap structure to sort elements.\n\n" +
 
         "A heap is a binary tree that must be complete (all positions filled) for every row except the last row. The last row might have empty " +
@@ -35,7 +36,7 @@ function HeapInfo() {
         "for i = n to 2\n" +
         "   exchange A[1] with A[i] //deletion phase \n" +
         "   Heapify(A, i, 0)\n\n" +
-        "//A is the array of length n and i is the element we are sifting????\n" +
+        "//A is the array of length n and i is the element we are sifting\n" +
         "Heapify(A[0..n - 1], n, i)\n" +
         "max = i, leftchild = 2i + 1, rightchild = 2i + 2\n" +
         "if (leftchild <= n) and (A[i] < A[leftchild])\n" +

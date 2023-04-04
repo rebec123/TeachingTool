@@ -1,7 +1,8 @@
 import SideMenu from '../Components/SideMenu';
+import "./Merge.css";
 
+//A page of additional information about merge sort
 function MergeInfo() {
-    //add button to switch to other algo info?
     let information = "Merge sort is a divide and conquer algorithm.\n\n"+
 
     "Firstly, the array being sorted is split in half. This is done until each sub array is 1 element long (because an array that is 1 element long "+
@@ -43,12 +44,12 @@ function MergeInfo() {
                     <div className="header-small">
                     <h1 className="title-ppt-style-small">Merge Sort Extra Information</h1>
                 </div>
-                <div className="info-desc">
+                <div className="info-desc-merge">
                     <h2 className="info-header">Description</h2>
                     {information}
                 </div>
                 <div classname="flex-stage">
-                <div className="info-pseudo">
+                <div className="info-pseudo-merge">
                     <h2 className="info-header">Pseudo Code</h2>
                     <div className="code-style">
                         {pseudoCode}
@@ -57,13 +58,13 @@ function MergeInfo() {
                     Taken from Algorithms i COMP2711 at The University of Leeds, credit to Dr. Natasha Shakhlevich
                     
                 </div>
-                <div className="info-time">
+                <div className="info-time-merge">
                     <h2 className="info-header">Time Complexity</h2>
                     O(n log<sub>2</sub>n)
                     </div>
                     </div>
-                </div>
             </div>
+        </div>
     );
 }
 export default MergeInfo;

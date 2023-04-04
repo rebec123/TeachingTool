@@ -5,16 +5,17 @@ import {
     Route,
     Navigate
 } from "react-router-dom";
-import "./App.css";//Useful! When we make a Merge.css file, we gotta include it in merge.js imports
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
+import "./App.css";
 import About from "./Pages/About";
 import Merge from "./Pages/Merge";
 import Heap from "./Pages/Heap";
 import MergeInfo from "./Pages/MergeInfo";
 import HeapInfo from "./Pages/HeapInfo";
 
+//Different menu options as js equivalent of contants
 const Algorithm = Object.freeze({
     None: Symbol("none"),
     Merge: Symbol("merge"),
@@ -22,26 +23,16 @@ const Algorithm = Object.freeze({
     About: Symbol("about")
 })
 
-const ContentType = Object.freeze({
-    None: Symbol("none"),
-    Demo: Symbol("demo"),
-    Easy: Symbol("easy"),
-    Hard: Symbol("hard")
-})
-
 function Menu() {
     const [algoChoice, setAlgoChoice] = useState(Algorithm.None);
-    const [contentChoice, setContentChoice] = useState(ContentType.None);
     const [redirect, setRedirect] = useState(null);
 
     const onMergeClick = () => {
-        //this.setState({ madeAlgoChoice: true, algoChoice: Algorithm.Merge }, () => { console.log(this.madeAlgoChoice) });
         setAlgoChoice(Algorithm.Merge);
         setRedirect("/Merge");
     }
 
     const onHeapClick = () => {
-        //this.setState({ algoChoice: Algorithm.Heap, madeAlgoChoice: true }, () => { console.log(this.madeAlgoChoice) });
         setAlgoChoice(Algorithm.Heap);
         setRedirect("/Heap");
     }
@@ -49,30 +40,10 @@ function Menu() {
     const onAboutClick = () => {
         setAlgoChoice(Algorithm.About);
         setRedirect("/About");
-
     }
 
-    const onDemoClick = () => {
-        setRedirect(ContentType.Demo);
-
-    }
-
-    /*const onEasyClick = () => {
-        setContentChoice(ContentType.Easy);
-        //console.log(this.algoChoice);
-        if (algoChoice === Algorithm.Merge) {
-            setRedirect("/Merge");
-        }
-        else if (algoChoice === Algorithm.Heap) {
-            setRedirect("/Heap");
-        }
-    }*/
-
-    const onHardClick = () => {
-        setContentChoice(ContentType.Hard);
-    }
-
-    const selection1 = () => {
+    //Buttons to allow user to nav to different page
+    const selection = () => {
         console.log("Algo choice: " + algoChoice.toString());
         if (algoChoice === Algorithm.None) {
             return (
@@ -95,28 +66,7 @@ function Menu() {
         return;
     }
 
-   /* const selection2 = () => {
-        if (algoChoice !== Algorithm.None) {
-            return (
-                <div>
-                    <button onClick={() => { onDemoClick() }} >
-                        Demo
-                    </button>
-                    <button onClick={() => { onEasyClick() }}>
-                        Easy Practice
-                    </button>
-                    <button onClick={() => { onHardClick() }}>
-                        Hard Practice
-                    </button>
-
-                </div>
-            );
-        }
-        else {
-            return;
-        }
-    }*/
-
+    //Called when user has selected the page they want to go to
     const redirectPage = () => {
         let result = [];
         if (redirect) {
@@ -126,7 +76,6 @@ function Menu() {
         return result;
     }
 
-    //Do not forget brackets when calling functions in return!!!
     return (
         <>
             <div className="flex-stage">
@@ -136,15 +85,14 @@ function Menu() {
             </div>
             <div>
                 {redirectPage()}
-                {selection1()}
-                {/*selection2()*/}
-
+                {selection()}
             </div>
 
         </>
     );
 }
 
+//Routes of the app and react DnD info
 function App() {
     return (
         <DndProvider backend={HTML5Backend}>
@@ -157,7 +105,6 @@ function App() {
                         <Route exact path="/Heap" element={<Heap />} />
                         <Route exact path="/Merge-Info" element={<MergeInfo />} />
                         <Route exact path="/Heap-Info" element={<HeapInfo />} />
-                  {/*<Route path="*" element={<NoPage />} />*/}
               </Routes>
             </Router>
             </div>
