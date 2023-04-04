@@ -331,17 +331,18 @@
     font-size: 30px;
 }
 
-.well-done-merge {
+.end-screen-merge {
+    white-space: pre-wrap;
     font-weight: normal;
     font-size: 30px;
     background-color: var(--merge-light-colour);
     width: 30%;
-    padding:20px;
+    padding: 20px;
     margin-left: auto;
     margin-right: auto;
 }
 
-.well-done-heap {
+.end-screen-heap {
     font-weight: normal;
     font-size: 30px;
     background-color: var(--heap-light-colour);

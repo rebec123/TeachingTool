@@ -32,21 +32,23 @@ import SideMenu from '../Components/SideMenu';
 
 const feedback = {
     insert_click: "Click the position in the heap where the next element from the array should go.",
-    delete: "That's right. \nNow click the node that should be deleted from the heap and added to the ordered array.",
+    delete: "That's right! \nNow click the node that should be deleted from the heap and added to the ordered array.",
     sift: "That's right!\nNow the root needs sifting down the heap to maintiain the following property:" +
         "\n~A child node cannot be larger than a parent node~" +
         "\nDrag the largest child of the root to replace ",
     correct_no_sift: "That's right! \nAlso, the new root is not smaller than its children so the heap does not need sifting." +
         "\nClick the node that should be deleted next.",
-    not_child: "That's not quite right. \nAre you choosing a child of the node you're trying to swap?",
-    not_last_pos_insert: "That's not quite right. \nAre you choosing the left-most node on the current row of the heap?",
-    not_last_pos_del: "That's not quite right. \nAre you choosing the right-most node on the last row of the heap?",
-    not_largest_child: "That's not quite right. \nDid you choose the node's largest child?",
     reorder: "That's right! \nNow the heap needs reordering to hold the property: \n~A child node cannot be larger than a parent node~." +
         "\nDrag the invalid child node to the position of its parent to swap the two.",
-    unordered_insert: "That's not quite right. \nCan you see any child nodes greater than their parents?\nDrag the child to the position of the parent to swap them.",
     drag_new_root: "That's right! \nDrag the correct node to take the place of the old root node.",
-    wrong_new_root: "That's not quite right. \nWhich node always gets deleted in a heap?"
+    not_right: "That's not quite right.",
+    not_child_active: "\nAre you choosing a child of the node you're trying to swap?",
+    not_bigger_swap_active: "\nIs the child node you're trying to swap larger than its parent?",
+    not_last_pos_insert_active: "\nAre you choosing the left-most position on the current row of the heap?",
+    wrong_new_root_active: "\nAre you choosing the right-most node on the last row of the heap?",
+    not_largest_child_active: "\nDid you choose the node's largest child?",
+    unordered_insert_active: "\nCan you see any child nodes greater than their parents?\nDrag the child to the position of the parent to swap them.",
+    wrong_del_root_active: "\nWhich node always gets deleted in a heap?"
 }
 const elementList = []
 
@@ -105,7 +107,9 @@ function Heap() {
     const [tree, setTree] = useState(treeSetUp());
     const [topArray, setTopArray] = useState(elementList);//useState([,]);//Code doesn't like this w/o comma
     const [arIndex, setArIndex] = useState(0);//start at 1 or 0?
-    const [mode, setMode] = useState("insertion")//temp!!!Change to start as insertion after we've finished coding deletion
+    const [mode, setMode] = useState("insertion");
+    const [cMistakes, setCMistakes] = useState(0);//mistakes made on the user's current task
+    const [tMistakes, setTMistakes] = useState(0);//overall mistakes made
     const [done, setDone] = useState(false);
     const [{ isOver }, drop] = useDrop(() => ({
         accept: "single-element",
@@ -114,56 +118,71 @@ function Heap() {
             isOver: !!monitor.isOver(),
         }),
     }),
-    [mode, arIndex])//add tree to this and ifx out the id index mystery (wasn't updating state properly before hence hwy got differen things)
+        [mode, arIndex, cMistakes, tMistakes])//add tree to this and ifx out the id index mystery (wasn't updating state properly before hence hwy got differen things)
 
     const dropElementD = (indexOfDropped) => {
         console.log("Deletion drop " + indexOfDropped);
     }
 
-    function dropElement(indexOfDropped){
+    function dropElement(indexOfDropped) {
+        let currentMis = cMistakes;
         let indexOfTarget = tree.findIndex(el => el.ref === drop);
-        console.log("mode in drop: " + mode);
         console.log("dropped : " + indexOfDropped + " target : " + indexOfTarget);
         //insertion mode
         if (mode ==="insertion") {
-            if (indexOfTarget === Math.floor(indexOfDropped / 2) && tree[indexOfDropped].contents > tree[indexOfTarget].contents) {
-                //console.log("Valid af!");
+            if (indexOfTarget === Math.floor(indexOfDropped / 2)) {
+                if (tree[indexOfDropped].contents > tree[indexOfTarget].contents) {
+                    setTMistakes(tMistakes + currentMis);
+                    setCMistakes(0);
 
-                let swapNodeDropped = tree[indexOfDropped];
-                let swapNodeTarget = tree[indexOfTarget];
+                    let swapNodeDropped = tree[indexOfDropped];
+                    let swapNodeTarget = tree[indexOfTarget];
+                    let newTree = tree;
+                  
+                    newTree[indexOfDropped] = swapNodeTarget;
+                    newTree[indexOfDropped].ref = undefined;
+                    newTree[indexOfTarget] = swapNodeDropped;
+                    setTree(newTree);
+                    needToReorder(indexOfTarget)//was index of dropped but they've swapped now
+                    console.log("ar index: " + arIndex + " ele len: " + elementList.length);
 
-                let newTree = tree;
-                newTree[indexOfDropped] = swapNodeTarget;
-                newTree[indexOfDropped].ref = undefined;
-                newTree[indexOfTarget] = swapNodeDropped;
-                setTree(newTree);
-                needToReorder(indexOfTarget)//was index of dropped but they've swapped now
-                console.log("ar index: " + arIndex + " ele len: " + elementList.length);
-                if (isTreeComplete() && arIndex === elementList.length) {
-                    setMode("deletion");//not updating soon neough, uh oh! might need to move :/
-                    setTopArray([,]);
-                    setTipText(feedback["delete"]);
-                    console.log("deletion time");
-                    console.log("just set mode in drop: " + mode);
+                    if (isTreeComplete() && arIndex === elementList.length) {
+                        setMode("deletion");//not updating soon neough, uh oh! might need to move :/
+                        setTopArray([,]);
+                        setTipText(feedback["delete"]);
+                        console.log("deletion time");
+                        console.log("just set mode in drop: " + mode);
+                    }
+                }
+                else {
+                    let active = "";
+                    if (currentMis > 0) {
+                        active = feedback["not_bigger_swap_active"];
+                    }
+                    setTipText(feedback["not_right"] + active);
+                    setCMistakes(currentMis + 1);
                 }
             }
             else {
-                console.log("not valid");
+                let active = "";
+                if (currentMis > 0) {
+                    active = feedback["not_child_active"];
+                }
+                setTipText(feedback["not_right"] + active);
+                setCMistakes(currentMis + 1);
             }
-        }//not setting to deletion mode in here when you shoudl?
-        else if (mode ==="deletion") {//changed this from mode==="deletion";
-            //NTS: big yikes, not index but id now, what is happening? it gave index in insertion mode!
-            //target index still correct cos it just looks for chichever element has drop ref and retuns that index :)
+        }
+        else if (mode ==="deletion") {
             console.log("indexOfDropped " + indexOfDropped);
             let droppedIndex = tree.findIndex(el => el.id === indexOfDropped);
             let x = tree.findIndex(el => el.id === indexOfDropped);
-
-            //console.log(tree);
             console.log("dropped index" + droppedIndex);
-            //User needs to drag the latest element to be the new root
+            //User needs to drag the last element in the heap to be the new root
             if (tree[1].contents === " ") {
                 if (droppedIndex === tree.length - 1) {
-                    console.log("valid deletion mode drop");
+                    setTMistakes(tMistakes + currentMis);
+                    setCMistakes(0);
+
                     let newTree = tree;
                     let newRoot = tree[droppedIndex];
                     newRoot.ref = drop;
@@ -189,12 +208,16 @@ function Heap() {
                 //make left/right child a drop?
                 }
                 else {
-                    setTipText(feedback["not_last_pos_del"]);
+                    let active = "";
+                    if (currentMis > 0) {
+                        active = feedback["wrong_new_root_active"];
+                    }
+                    setTipText(feedback["not_right"] + active);
+                    setCMistakes(currentMis + 1);
                 }
             }
             //We're sifitng root down
             else if (tree[1].contents) {
-                console.log("Got to sifting down logic");
                 if (indexOfTarget === Math.floor(droppedIndex / 2)) {
                     //if that was the biggest child, then swap. otherwise tell user that they have to choose biggest child
                     //if dropped index odd, its a left child otherwise its right
@@ -207,12 +230,20 @@ function Heap() {
                     if (sibling < tree.length) {
                         //and sibling's contents are greater than the node the user dragged, we need to correct them
                         if (tree[sibling].contents > tree[droppedIndex].contents) {
-                            setTipText(feedback["not_largest_child"]);
+                            let active = "";
+                            if (currentMis > 0) {
+                                active = feedback["not_largest_child_active"];
+                            }
+                            setTipText(feedback["not_right"] + active);
+                            setCMistakes(currentMis + 1);
                             return;
                         }
 
                     }
                     //User chose the correct node to swap
+                    setTMistakes(tMistakes + currentMis);
+                    setCMistakes(0);
+
                     let swapNodeDropped = tree[droppedIndex];
                     let swapNodeTarget = tree[indexOfTarget];
 
@@ -227,10 +258,12 @@ function Heap() {
                     needToReorder(droppedIndex);
                 }
                 else {
-                    setTipText(feedback["not_child"])
-                    //ToDo: Seems to give this even when not true, fix!
-
-                    //Also! make sure user can keep deleting and sifting till the end, broken atm 
+                    let active = "";
+                    if (currentMis > 0) {
+                        active = feedback["not_child_active"];
+                    }
+                    setTipText(feedback["not_right"] + active);
+                    setCMistakes(currentMis + 1);
                 }
             }
         }
@@ -244,11 +277,7 @@ function Heap() {
 
     const array = () => {
         const result = [];
-        //console.log("arra: " + mode);
-        if (mode === "insertion") {//temp!!!!! change so there's a state that maintains what should appear in this array
-            //shouldn't be element list! just temporary. If numbers aren't in array (been removed) should still maintain each posiition so we see empty array properly
-            //need to make ar-el-container a drag target during deletion process?? Or should user just becale to click the node they want to delete?
-            //console.log(elementList);
+        if (mode === "insertion") {
             result.push(
                 <>
                     {
@@ -343,7 +372,7 @@ function Heap() {
                 return true;
             }
             else {
-                setTipText(feedback["insert_click"]);//tell them to click where next thing should go unless array all in tree now, then tell them to delete a node?
+                setTipText(feedback["insert_click"]);
                 return false;
             }
         }
@@ -361,10 +390,15 @@ function Heap() {
     }
     //"I" for insertion phase
     const onNodeClickI = (index) => {
+        let currentMis = cMistakes;
         //checking the user filled in the correct node (binary tree needs to be "complete" for heapsort algorithm)
         let treeComplete = isTreeComplete();
         console.log(treeComplete);
+        //User clicked correct position
         if (index - 1 === arIndex && treeComplete) {
+            setTMistakes(tMistakes + currentMis);
+            setCMistakes(0);
+
             let newContents = elementList[arIndex].contents;
             let oldTree = tree;
             tree.findIndex((el) => (el.index))
@@ -384,17 +418,29 @@ function Heap() {
 
         }
         else if (!isTreeComplete()) {
-            setTipText(feedback["unordered_insert"]);
+            let active = "";
+            if (currentMis > 0) {
+                active = feedback["unordered_insert_active"];
+            }
+            setTipText(feedback["not_right"] + active);
+            setCMistakes(currentMis + 1);
         }
         else {
-            setTipText(feedback["not_last_pos_insert"]);
+            let active = "";
+            if (currentMis > 0) {
+                active = feedback["not_last_pos_insert_active"];
+            }
+            setTipText(feedback["not_right"] + active);
+            setCMistakes(currentMis + 1);
         }
+        //Is all of the array in the heap? If so, time for deletion phase
         if (isTreeComplete() && arIndex === elementList.length - 1) {
-            setMode("deletion");//not updating soon neough, uh oh! might need to move :/
+            setTMistakes(tMistakes + currentMis);
+            setCMistakes(0);
+
+            setMode("deletion");
             setTopArray([,]);
             setTipText(feedback["delete"]);
-            console.log("deletion time");
-           // console.log("mode in  clikc: " + mode);
         }
     }
 
@@ -402,7 +448,12 @@ function Heap() {
     const onNodeClickD = (index) => {
         //console.log("on click " + mode);
         console.log(isTreeComplete());
+        let currentMis = cMistakes;
+        //User has finished task
         if (index === 1 && tree.length == 2) {
+            setTMistakes(tMistakes + currentMis);
+            setCMistakes(0);
+
             let newTopArray = topArray;
             console.log("c: " + tree[1].contents + " id: " + tree[1].id);
             newTopArray.push(tree[1]);
@@ -411,10 +462,12 @@ function Heap() {
             newTree.pop();
             setTree(newTree);
             setDone(true);
-            //This isn't working, could just redirect them to an end screen?
         }
-        if (index === 1 && isTreeComplete()) {//it has to be largest element in array!
-            console.log("woop");
+        //User deleted the correct node (root)
+        if (index === 1 && isTreeComplete()) {
+            setTMistakes(tMistakes + currentMis);
+            setCMistakes(0);
+
             let newTopArray = topArray;
             newTopArray.push(tree[1]);
             setTopArray(newTopArray);
@@ -422,25 +475,26 @@ function Heap() {
             newTree[1] = {
                 id: "", contents: " ", ref: drop
             };
-            //newTree[1].ref = drag
             setTree(newTree);
-            //console.log(tree.length);
             setTipText(feedback["drag_new_root"]);
         }
+        //User deleted wrong node
         else {
-            setTipText(feedback["wrong_new_root"]);
+            let active = "";
+            if (currentMis > 0) {
+                active = feedback["wrong_del_root_active"];
+            }
+            setTipText(feedback["not_right"] + active);
+            setCMistakes(currentMis + 1);
         }
     }
-    //need to empty array as tree gets filled?
-    //need an arrow or colour pointing to element in array being placed in tree
-    //Weird: grey looks smaller than black cirlce
+
     const nodeDisplay = (i) => {
         let result = [];
-        if (i > tree.length-1) {//out of bounds
+        if (i > tree.length-1) {//Out of bounds so display nothing
             return result;
         }
         //Tree is ordered and its time to delete root
-        //console.log(tree);
         if (mode === "deletion" && isTreeComplete()) {
             //deletion mode (getting ordered array)
             //console.log(tree[i].ref);//delete root then drag node that should take its place? then drag around
@@ -582,20 +636,76 @@ function Heap() {
     }
     const pageContents = () => {
         if (done) {
-            return (
-                <>
-                    <div className="header-small">
-                        <h1 className="title-ppt-style-small">Heap Sort</h1>
-                    </div>
-                    <h2 className="well-done-heap">Well Done!</h2>
-                    <div className="stage">
-                        <Confetti recycle={false} numberOfPieces="100" />
-                        <a className="homeButton" href="/">
-                            <button className="btn-back">Home</button>
-                        </a>
-                    </div>
-                </>
-            );
+            if (tMistakes === 0) {
+                return (
+                    <>
+                        <div className="header-small">
+                            <h1 className="title-ppt-style-small">Heap Sort</h1>
+                        </div>
+                        <div className="end-screen-merge">
+                            <h2>Well Done!</h2>
+                            You made 0 mistakes
+                        </div>
+                        <div className="stage">
+                            <Confetti recycle={false} numberOfPieces="200" />
+                            <a className="homeButton" href="/">
+                                <button className="btn-back">Home</button>
+                            </a>
+                        </div>
+                    </>
+                );
+            }
+            else if (tMistakes === 1) {
+                return (
+                    <>
+                        <div className="header-small">
+                            <h1 className="title-ppt-style-small">Heap Sort</h1>
+                        </div>
+                        <div className="end-screen-heap">
+                            <h2>Good job!</h2>
+                            You only made 1 mistake, why not practice again and get it down to 0?
+                        </div>
+                        <div className="stage">
+                            <Confetti recycle={false} numberOfPieces="100" />
+                            <a className="homeButton" href="/">
+                                <button className="btn-back">Home</button>
+                            </a>
+                        </div>
+                    </>
+                );
+            }
+            else if (tMistakes < 5) {
+                return (
+                    <>
+                        <div className="header-small">
+                            <h1 className="title-ppt-style-small">Heap Sort</h1>
+                        </div>
+                        <div className="end-screen-heap">
+                            <h2>Good job</h2>
+                            You only made {tMistakes} mistakes, why not practice again and get it down to 0?
+                        </div>
+                        <div className="stage">
+                            <Confetti recycle={false} numberOfPieces="100" />
+                            <a className="homeButton" href="/">
+                                <button className="btn-back">Home</button>
+                            </a>
+                        </div>
+                    </>
+                );
+            }
+            else {
+                return (
+                    <>
+                        <div className="header-small">
+                            <h1 className="title-ppt-style-small">Heap Sort</h1>
+                        </div>
+                        <div className="end-screen-heap">
+                            <h2>Good try</h2>
+                            You made {tMistakes} mistakes, practice again and see if you can improve!
+                        </div>
+                    </>
+                );
+            }
         }
         else {
             return (
@@ -618,6 +728,7 @@ function Heap() {
                 <SideMenu pageWrapId={'page-wrap'} outerContainerId={'outer-container'} algorithm="heap" />
                 <div id="page-wrap">
                     {pageContents()}
+
                 </div>
             </div>
         </>

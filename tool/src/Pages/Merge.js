@@ -11,9 +11,10 @@ import SideMenu from '../Components/SideMenu';
 const feedback = {
     merge_start: "Click 'split' to start splitting the arrays in half.",
     merge_drag: "Merge the two highlighted arrays into one. \nDrag the elements into the new array in order of lowest to highest.",
-    merge_wrong_number: "That's not quite right.\nHave you included all the elements from the child arrays? \nAre you adding each element only once?",
+    not_right: "That's not quite right.",
+    merge_wrong_num_active:"\nHave you included all the elements from the child arrays? \nAre you adding each element only once?",
     continue_split: "That's right! \nContinue splitting the arrays that have not yet been split.",
-    wrong_order: "That's not quite right. \nDid you order the elements from lowest to highest?"
+    wrong_order_active: "\nDid you order the elements from lowest to highest?"
 }
 /*{
         id: 1,
@@ -216,6 +217,8 @@ function Merge() {
     const [arrays, setArrays] = useState(divContents());
     const [divToMerge, setDivToMerge] = useState(0);
     const [mergeArray, setMergeArray] = useState([]);
+    const [cMistakes, setCMistakes] = useState(0);//mistakes made on the user's current task
+    const [tMistakes, setTMistakes] = useState(0);//overall mistakes made
     const [done, setDone] = useState(false);
     const [{ isOver }, drop] = useDrop(() => ({
         accept: "single-element",
@@ -296,8 +299,8 @@ function Merge() {
     const onMergeClick = (div) => {
         let sorted = true;
         let allElements = true;
-        //TODO might need to readjust the "allElements" checking (parts may be redundant) after we get one el at time working
-        //if merge array contains each of the required elements and is the same length as two sub arrays added, we didnt miss any elements
+        let currentMis = cMistakes;
+        //Checking all elements from array 1 have been added
         for (let i = 0; i < arrays[div * 2].contents.length; i++) {
             let index = mergeArray.findIndex(el => el.id === arrays[div * 2].contents[i].id);
             console.log(index);
@@ -305,6 +308,7 @@ function Merge() {
                 allElements = false;
             }
         }
+        //Checking all elements from array 2 have been added
         for (let i = 0; i < arrays[(div * 2) + 1].contents.length; i++) {
             let index = mergeArray.findIndex(el => el.id === arrays[(div * 2) + 1].contents[i].id);
             console.log(index);
@@ -312,21 +316,29 @@ function Merge() {
                 allElements = false;
             }
         }
-        console.log("Got all elements: " + allElements);//Got here!
+        console.log("Got all elements: " + allElements);
+        //Checking there's no repeated elements
         if (mergeArray.length !== arrays[div * 2].contents.length + arrays[(div * 2) + 1].contents.length) {
             allElements = false;
         }
         if (!allElements) {
-            setTipText(feedback["merge_wrong_number"]);
+            let active = "";
+            if (currentMis > 0) {
+                active = feedback["merge_wrong_num_active"];
+            }
+            setTipText(feedback["not_right"] + active);
+            setCMistakes(currentMis + 1);
             setMergeArray([]);
             return;
         }
-        console.log("Got no extra elements: " + allElements);//Got here!
+        console.log("Got no extra elements: " + allElements);
         //Checking if the array is sorted
         for (let i = 0; i < mergeArray.length - 1; i++) {
             if (mergeArray[i].contents > mergeArray[i + 1].contents) { sorted = false; break; }
         }
         if (sorted) {
+            setTMistakes(tMistakes + currentMis);
+            setCMistakes(0);
             let oldArrays = arrays;
 
             //Setting arrays back to black and updating variables of newly merged array
@@ -356,7 +368,12 @@ function Merge() {
             isMergePossible(Math.floor(div / 2));
         }
         else {
-            setTipText(feedback["wrong_order"]);//ToDo: change to helper text instead of title
+            let active = "";
+            if (currentMis > 0) {
+                active = feedback["wrong_order_active"];
+            }
+            setTipText(feedback["not_right"] + active);
+            setCMistakes(currentMis + 1);
             setMergeArray([]);
         }
     }
@@ -581,20 +598,58 @@ function Merge() {
         if (done) {//change back to "done" after testing
             //can change confetti colours!
             //could adjust amount of confetti based on user's score
-            return (
-                <>
-                    <div className="header-small">
-                        <h1 className="title-ppt-style-small">Merge Sort</h1>
-                    </div>
-                    <h2 className="well-done-merge">Well Done!</h2>
-                    <div className="stage">
-                        <Confetti recycle={false} numberOfPieces="100" />
-                        <a className="homeButton" href="/">
-                            <button className="btn-back">Home</button>
-                        </a>
-                    </div>
-                </>
-            );
+            if (tMistakes===0) {
+                return (
+                    <>
+                        <div className="header-small">
+                            <h1 className="title-ppt-style-small">Merge Sort</h1>
+                        </div>
+                        <div className="end-screen-merge">
+                            <h2>Well Done!</h2>
+                                You made 0 mistakes
+                        </div>
+                        <div className="stage">
+                            <Confetti recycle={false} numberOfPieces="200" />
+                            <a className="homeButton" href="/">
+                                <button className="btn-back">Home</button>
+                            </a>
+                        </div>
+                    </>
+                );
+            }
+            else if (tMistakes === 1) {
+                return (
+                    <>
+                        <div className="header-small">
+                            <h1 className="title-ppt-style-small">Merge Sort</h1>
+                        </div>
+                        <div className="end-screen-merge">
+                            <h2>Good job!</h2>
+                            You only made 1 mistake, why not practice again and get it down to 0?
+                        </div>
+                        <div className="stage">
+                            <Confetti recycle={false} numberOfPieces="100" />
+                            <a className="homeButton" href="/">
+                                <button className="btn-back">Home</button>
+                            </a>
+                        </div>
+                    </>
+                );
+            }
+            else {
+                return (
+                    <>
+                        <div className="header-small">
+                            <h1 className="title-ppt-style-small">Merge Sort</h1>
+                        </div>
+                        <div className="end-screen-merge">
+                            <h2>Good try</h2>
+                            You made {tMistakes} mistakes, practice again and see if you can improve!
+                        </div>
+                    </>
+                );
+            }
+            
         }
         else {
             return (
