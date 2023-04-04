@@ -5,13 +5,15 @@ import {
     Route,
     Navigate
 } from "react-router-dom";
-import "./App.css";
+import "./App.css";//Useful! When we make a Merge.css file, we gotta include it in merge.js imports
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
 import About from "./Pages/About";
 import Merge from "./Pages/Merge";
 import Heap from "./Pages/Heap";
+import MergeInfo from "./Pages/MergeInfo";
+import HeapInfo from "./Pages/HeapInfo";
 
 const Algorithm = Object.freeze({
     None: Symbol("none"),
@@ -152,7 +154,9 @@ function App() {
                   <Route exact path="/" element={<Menu/>} />
                   <Route exact path="/About" element={<About />} />
                   <Route exact path="/Merge" element={<Merge />} />
-                  <Route exact path="/Heap" element={<Heap />} />
+                        <Route exact path="/Heap" element={<Heap />} />
+                        <Route exact path="/Merge-Info" element={<MergeInfo />} />
+                        <Route exact path="/Heap-Info" element={<HeapInfo />} />
                   {/*<Route path="*" element={<NoPage />} />*/}
               </Routes>
             </Router>

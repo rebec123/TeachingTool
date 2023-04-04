@@ -3,12 +3,18 @@ import {
     BrowserRouter as Router,
     Navigate
 } from "react-router-dom";
-//import Element from "../Components/Element";
 import { useDrop, useDrag } from "react-dnd";
-//import { toBeVisible } from "../../node_modules/@testing-library/jest-dom/dist/to-be-visible";
 import cloneDeep from 'lodash/cloneDeep';//Need deep clones to ensure each split array can be rearranged w/o effecting all arrays
 import Confetti from 'react-confetti'
+import SideMenu from '../Components/SideMenu';
 
+const feedback = {
+    merge_start: "Click 'split' to start splitting the arrays in half.",
+    merge_drag: "Merge the two highlighted arrays into one. \nDrag the elements into the new array in order of lowest to highest.",
+    merge_wrong_number: "That's not quite right.\nHave you included all the elements from the child arrays? \nAre you adding each element only once?",
+    continue_split: "That's right! \nContinue splitting the arrays that have not yet been split.",
+    wrong_order: "That's not quite right. \nDid you order the elements from lowest to highest?"
+}
 /*{
         id: 1,
         contents: 6
@@ -38,73 +44,7 @@ import Confetti from 'react-confetti'
         id: 6,
         contents: 7
     }*/
-const elementList = [
-    {
-        id: 1,
-        contents: 6
-    },
-
-    {
-        id: 2,
-        contents: 5
-    },
-
-    {
-        id: 3,
-        contents: 3
-    },
-
-    {
-        id: 4,
-        contents: 1
-    },
-
-    {
-        id: 5,
-        contents: 8
-    },
-
-    {
-        id: 6,
-        contents: 7
-    }/*,
-
-    {
-        id: 7,
-        contents: 2
-    },
-
-    {
-        id: 8,
-        contents: 4
-    },
-
-    {
-        id: 9,
-        contents: 3
-    },
-
-    {
-        id: 10,
-        contents: 1
-    },
-
-    {
-        id: 11,
-        contents: 10
-    },
-
-    {
-        id: 12,
-        contents: 7
-    },
-
-    {
-        id: 13,
-        contents: 3
-    }*/
-
-]
+const elementList = []
 const _kMaxNumOfDivs = 31;
 
 function Element({ id, contents, style }) {
@@ -127,6 +67,7 @@ function Element({ id, contents, style }) {
 //function returns the array elements that should be in that sub array
 //Could implement memoization (saves result of calls incase called again, like cache)
 const getElementsByDiv = (div) => {
+    //Firstly, randomly generate an array
     let parentLen = 0;
     let lowerBound = 0;
     let upperBound = 0;
@@ -221,8 +162,26 @@ const getChildRight = (parent) => {
     }
 }
 //-----------------------------------------------------------------
+//React loads twice, so need to make sure list is only created once
+let arrayCreated = false;
+function createArray() {
+    if (arrayCreated === false) {
+        arrayCreated = true
+        let length = Math.floor((Math.random() * 10) + 6);// generates a number between 6 and 15 ((max-min +1) + min)
+        for (let i = 0; i < length; i++) {
+            elementList.push({
+                id: i + 1,
+                contents: Math.floor(Math.random() * 9) + 1
+            });
+        }
+        console.log("length " + elementList.length);
+        console.log(elementList);
+        return elementList;
+    }
+}
 
 const divContents = () => {
+    createArray();
     let allNewArrays = [];
     allNewArrays.push({});
     for (let i = 1; i <= _kMaxNumOfDivs; i++) {
@@ -252,8 +211,7 @@ function Merge() {
     //do not change state INSIDE render, because you will get stuck in endless loop and hang!
     //const [title, setTitle] = useState("Merge Sort");
     const [redirect, setRedirect] = useState(null);
-    const [tipText, setTipText] = useState("Click 'split' to start splitting the arrays in half.");
-    const [mode, setMode] = useState("splitting");//ToDo:change to merging when in merge mode, this should disable split buttons until meregd??
+    const [tipText, setTipText] = useState(feedback["merge_start"]);
     const [visibleDivs, setVisibleDivs] = useState([1]);
     const [arrays, setArrays] = useState(divContents());
     const [divToMerge, setDivToMerge] = useState(0);
@@ -292,7 +250,7 @@ function Merge() {
         setArrays(oldArrays.map(
             ar => ((ar.index !== parent && ar.index !== child1 && ar.index !== child2) ? Object.assign(ar, { style: "ar-el-grey" }) : ar)
         ));
-        setTipText("Merge the two highlighted arrays into one. \nDrag the elements into the new array in order of lowest to highest.")
+        setTipText(feedback["merge_drag"]);
         /*setArrays(oldArrays.map(
             ar => ((ar.index === parent) ? Object.assign(ar, { contents: newContents }) : ar)
         ));*/
@@ -359,7 +317,7 @@ function Merge() {
             allElements = false;
         }
         if (!allElements) {
-            setTipText("That's not quite right.\nHave you included all the elements from the child arrays? \nAre you adding each elemnt only once?");//ToDo: change to helper text instead of title
+            setTipText(feedback["merge_wrong_number"]);
             setMergeArray([]);
             return;
         }
@@ -382,7 +340,7 @@ function Merge() {
                 setDone(true);
             }
             else {
-                setTipText("That's right! \nContinue splitting the arrays that have not yet been split.");//ToDo: change to helper text instead of title
+                setTipText(feedback["continue_split"]);//ToDo: change to helper text instead of title
             }
             //Resetting merge state values
             setDivToMerge(0);
@@ -398,7 +356,7 @@ function Merge() {
             isMergePossible(Math.floor(div / 2));
         }
         else {
-            setTipText("That's not quite right. \nDid you order the elements from lowest to highest?");//ToDo: change to helper text instead of title
+            setTipText(feedback["wrong_order"]);//ToDo: change to helper text instead of title
             setMergeArray([]);
         }
     }
@@ -620,7 +578,7 @@ function Merge() {
 
 
     const pageContents = () => {
-        if (done) {//chanhe back to "done" after testing
+        if (done) {//change back to "done" after testing
             //can change confetti colours!
             //could adjust amount of confetti based on user's score
             return (
@@ -664,7 +622,12 @@ function Merge() {
 
     return (
         <>
-            {pageContents()}
+            <div id="outer-container">
+                <SideMenu pageWrapId={'page-wrap'} outerContainerId={'outer-container'} algorithm="merge" />
+                <div id="page-wrap">
+                    {pageContents()}
+                </div>
+            </div>
         </>
     );
 }

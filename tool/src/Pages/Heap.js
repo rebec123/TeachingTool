@@ -1,25 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useDrop, useDrag } from "react-dnd";
 import Confetti from 'react-confetti'
-//import Tree from 'react-d3-tree';
+import SideMenu from '../Components/SideMenu';
 
-//not usre we need this anymore
-/*function TreeStruct({ datatata }) {
-    //ToDo: Translate needs to dynamically know size of div and translate to half of it (to centre tree)
-    return (
-        // `<Tree />` will fill width/height of its container; in this case `#treeWrapper`.
-        <div className="tree-wrapper" style={{ width: '300em', height: '1000em' }}>
-            <Tree
-                data={orgChart}
-                pathFunc="straight"
-                orientation="vertical"
-                zoomable={false}
-                draggable={false}
-                translate={{ x: 500, y: 25 }}
-            />
-        </div>
-    );
-}
+/*
 {
         id: 1,
         contents: 6
@@ -44,58 +28,28 @@ import Confetti from 'react-confetti'
         id: 5,
         contents: 8
     }
-
-
 */
 
-//When user needs to switch node position, that should be text tip until they've done it
+const feedback = {
+    insert_click: "Click the position in the heap where the next element from the array should go.",
+    delete: "That's right. \nNow click the node that should be deleted from the heap and added to the ordered array.",
+    sift: "That's right!\nNow the root needs sifting down the heap to maintiain the following property:" +
+        "\n~A child node cannot be larger than a parent node~" +
+        "\nDrag the largest child of the root to replace ",
+    correct_no_sift: "That's right! \nAlso, the new root is not smaller than its children so the heap does not need sifting." +
+        "\nClick the node that should be deleted next.",
+    not_child: "That's not quite right. \nAre you choosing a child of the node you're trying to swap?",
+    not_last_pos_insert: "That's not quite right. \nAre you choosing the left-most node on the current row of the heap?",
+    not_last_pos_del: "That's not quite right. \nAre you choosing the right-most node on the last row of the heap?",
+    not_largest_child: "That's not quite right. \nDid you choose the node's largest child?",
+    reorder: "That's right! \nNow the heap needs reordering to hold the property: \n~A child node cannot be larger than a parent node~." +
+        "\nDrag the invalid child node to the position of its parent to swap the two.",
+    unordered_insert: "That's not quite right. \nCan you see any child nodes greater than their parents?\nDrag the child to the position of the parent to swap them.",
+    drag_new_root: "That's right! \nDrag the correct node to take the place of the old root node.",
+    wrong_new_root: "That's not quite right. \nWhich node always gets deleted in a heap?"
+}
+const elementList = []
 
-const elementList = [
-    {
-        id: 1,
-        contents: 6
-    },
-
-    {
-        id: 2,
-        contents: 5
-    },
-
-    {
-        id: 3,
-        contents: 3
-    },
-
-    {
-        id: 4,
-        contents: 1
-    },
-
-    {
-        id: 5,
-        contents: 8
-    }/*,
-    {
-        id: 6,
-        contents: 10
-    },
-    {
-        id: 7,
-        contents: 2
-    },
-
-    {
-        id: 8,
-        contents: 1
-    },
-
-    {
-        id: 9,
-        contents: 1
-    }*/
-]
-
-//ToDo:customise this for heap (number with no box) 
 function Element({ id, contents }) {
     const [{ isDragging }, drag] = useDrag(() => ({
         type: "single-element",//ToDo: use enums instead of string eventually
@@ -104,74 +58,40 @@ function Element({ id, contents }) {
             isDragging: !!monitor.isDragging(),
         })
     }))
-    //should item disappear while being dragged? i rekon so
-    return (<div className="ar-el-bare" ref={drag}>{contents}</div>);//style={{ "backgroundColor": isDragging ? "grey" : "none" }
+    return (<div className="ar-el-bare" ref={drag}>{contents}</div>);
 }
 
 //NTS index in tree is NOT equal to element id throughout, only at beginnign
 
-//Need to empty array as tree is built
+//React loads twice, so need to make sure list is only created once
+let arrayCreated = false;
+function createArray() {
+    if (arrayCreated === false) {
+        arrayCreated = true
+        let length = Math.floor((Math.random() * 10) + 6);// generates a number between 6 and 15 ((max-min +1) + min)
+        for (let i = 0; i < length; i++) {
+            elementList.push({
+                id: i + 1,
+                contents: Math.floor(Math.random() * 9) +1
+            });
+        }
+        console.log("length " + elementList.length);
+        console.log(elementList);
+        return elementList;
+    }
+}
 
 const treeSetUp = () => {
     let result = [];
-    if (false) {//Temp!!!!: testing mode for deletion
-        result.push({});
+    createArray();
+    console.log(elementList);
+    result.push({});
+    for (let i = 1; i <= elementList.length; i++) {
         result.push({
-            id: 5,
-            contents: 8,
+            id: i,
+            contents: "",
             ref: undefined
         });
-        result.push({
-            id: 1,
-            contents: 6,
-            ref: undefined
-        });
-        result.push({
-            id: 6,
-            contents: 7,
-            ref: undefined
-        });
-        result.push({
-            id: 4,
-            contents: 1,
-            ref: undefined
-        });
-        result.push({
-            id: 2,
-            contents: 5,
-            ref: undefined
-        });
-        result.push({
-            id: 3,
-            contents: 3,
-            ref: undefined
-        });
-        result.push({
-            id: 7,
-            contents:2,
-            ref: undefined
-        });
-        result.push({
-            id: 8,
-            contents: 1,
-            ref: undefined
-        });
-        result.push({
-            id: 9,
-            contents: 1,
-            ref: undefined
-        });
-
-    }
-    else {
-        result.push({});
-        for (let i = 1; i <= elementList.length; i++) {
-            result.push({
-                id: i,
-                contents: "",
-                ref: undefined
-            });
-        }
     }
     return result;
 }
@@ -181,7 +101,7 @@ const treeSetUp = () => {
 //if they think tree needs rearranging, they can drag elements to swap them?
 //we have a function that calculates what tree should look like and compare it to what the user came up with
 function Heap() {
-    const [tipText, setTipText] = useState("Click the position in the heap where the next element from the array should go.");
+    const [tipText, setTipText] = useState(feedback["insert_click"]);
     const [tree, setTree] = useState(treeSetUp());
     const [topArray, setTopArray] = useState(elementList);//useState([,]);//Code doesn't like this w/o comma
     const [arIndex, setArIndex] = useState(0);//start at 1 or 0?
@@ -195,12 +115,6 @@ function Heap() {
         }),
     }),
     [mode, arIndex])//add tree to this and ifx out the id index mystery (wasn't updating state properly before hence hwy got differen things)
-
-    /*useEffect(() => {
-        setTipText("Click the node that should be deleted from the heap and added to the new ordered array");
-        console.log("mode in effects: " + mode);
-        
-    }, [mode]);*/
 
     const dropElementD = (indexOfDropped) => {
         console.log("Deletion drop " + indexOfDropped);
@@ -228,7 +142,7 @@ function Heap() {
                 if (isTreeComplete() && arIndex === elementList.length) {
                     setMode("deletion");//not updating soon neough, uh oh! might need to move :/
                     setTopArray([,]);
-                    setTipText("Click the node that should be deleted from the heap and added to the ordered array.");
+                    setTipText(feedback["delete"]);
                     console.log("deletion time");
                     console.log("just set mode in drop: " + mode);
                 }
@@ -257,29 +171,25 @@ function Heap() {
                     //this is causing issue! trying to access when out of bounds!
                     if (tree.length === 3) {
                         if (newRoot.contents < tree[2].contents) {
-                            setTipText("That's right!\nNow the root needs sifting down the heap to maintiain the following property: " +
-                                "\n~A child node cannot be larger than a parent node~" +
-                                "\nDrag the largest child of the root to replace " + tree[1].contents + ".");
+                            setTipText(feedback["sift"] + tree[1].contents + ".");
                         }
                     }
                     else if (newRoot.contents < tree[2].contents || newRoot.contents < tree[3].contents) {
-                        setTipText("That's right!\nNow the root needs sifting down the heap to maintiain the following property: " +
-                            "\n~A child node cannot be larger than a parent node~" +
-                            "\nDrag the largest child of the root to replace " + tree[1].contents + ".");
+                        setTipText(feedback["sift"] + tree[1].contents + ".");
                     }
                     else {
-                        setTipText("That's right! \nAlso, the new root is not smaller than its children so the heap does not need sifting.\nClick the node that should be deleted next.");
+                        setTipText(feedback["correct_no_sift"]);
                     }
                     newTree.pop();
                     if (newTree.length === 2) {
-                        setTipText("That's right! \nNow click the node that should be deleted from the heap and added to the sorted array.");
+                        setTipText(feedback["delete"]);
                     }
                     setTree(newTree);
                 //delete last node from heap
                 //make left/right child a drop?
                 }
                 else {
-                    setTipText("That's not quite right. \nAre you choosing the node in the last position of the heap?");
+                    setTipText(feedback["not_last_pos_del"]);
                 }
             }
             //We're sifitng root down
@@ -297,7 +207,7 @@ function Heap() {
                     if (sibling < tree.length) {
                         //and sibling's contents are greater than the node the user dragged, we need to correct them
                         if (tree[sibling].contents > tree[droppedIndex].contents) {
-                            setTipText("That 's not quite right. \nDid you choose the root's largest child?");
+                            setTipText(feedback["not_largest_child"]);
                             return;
                         }
 
@@ -311,13 +221,13 @@ function Heap() {
                     newTree[droppedIndex].ref = undefined;
                     newTree[indexOfTarget] = swapNodeDropped;
                     setTree(newTree);
-                    setTipText("That's right! \nNow click the node that should be deleted from the heap and added to the sorted array.");
+                    setTipText(feedback["delete"]);
                     //console.log(droppedIndex);
                     //console.log(indexOfTarget);
                     needToReorder(droppedIndex);
                 }
                 else {
-                    setTipText("That's not quite right. \nAre you choosing a child of the node you're trying to swap?")
+                    setTipText(feedback["not_child"])
                     //ToDo: Seems to give this even when not true, fix!
 
                     //Also! make sure user can keep deleting and sifting till the end, broken atm 
@@ -420,13 +330,12 @@ function Heap() {
         //console.log(mode);
         if (mode === "insertion") {
             if (index === 1) {
-                setTipText("Click the position in the heap where the next element from the array should go.");
+                setTipText(feedback["insert_click"]);
                 return false;//Only one node in tree so no need to reorder
             }
             //can i get out of bounds below?? check if this code needs error checking 
             else if (tree[index].contents > tree[Math.floor(index / 2)].contents) {
-                setTipText("That's right! \nNow the heap needs reordering to hold the property: \n~A child node cannot be larger than a parent node~." +
-                    "\nDrag the invalid child node to the position of its parent to swap the two.");
+                setTipText(feedback["reorder"]);
                 let newTree = tree;
                 newTree[Math.floor(index / 2)].ref = drop;
                 setTree(newTree);
@@ -434,14 +343,14 @@ function Heap() {
                 return true;
             }
             else {
-                setTipText("Click the position in the heap where the next element from the array should go.");//tell them to click where next thing should go unless array all in tree now, then tell them to delete a node?
+                setTipText(feedback["insert_click"]);//tell them to click where next thing should go unless array all in tree now, then tell them to delete a node?
                 return false;
             }
         }
         else {//deletion mode
             //add error checking, maybe make its own function because repetition from "dropElement"
             if (tree[index].contents < tree[index * 2].contents || tree[index].contents < tree[(index * 2) +1].contents) {
-                setTipText("That's right! Looks like you need to switch nodes to hold the property: \n'A child node cannot be larger than a parent node'");
+                setTipText(feedback["reorder"]);
                 let newTree = tree;
                 newTree[Math.floor(index)].ref = drop;
                 setTree(newTree);
@@ -467,7 +376,7 @@ function Heap() {
             setTopArray(newArray);
             setArIndex(arIndex + 1);
 
-            setTipText("Click the position in the heap where the next element from the array should go.");
+            setTipText(feedback["insert_click"]);
             
             //Need to check that the child is less than parent (so it's a valid max heap);
             //console.log(tree);
@@ -475,15 +384,15 @@ function Heap() {
 
         }
         else if (!isTreeComplete()) {
-            setTipText("That's not quite right. \nCan you see any child nodes greater than their parents?\nDrag the child to the position of the parent to swap them.");
+            setTipText(feedback["unordered_insert"]);
         }
         else {
-            setTipText("That's not quite right. \nAre you choosing the next available position in the heap?");
+            setTipText(feedback["not_last_pos_insert"]);
         }
         if (isTreeComplete() && arIndex === elementList.length - 1) {
             setMode("deletion");//not updating soon neough, uh oh! might need to move :/
             setTopArray([,]);
-            setTipText("Click the node that should be deleted from the heap and added to the new ordered array.");
+            setTipText(feedback["delete"]);
             console.log("deletion time");
            // console.log("mode in  clikc: " + mode);
         }
@@ -501,7 +410,6 @@ function Heap() {
             let newTree = tree;
             newTree.pop();
             setTree(newTree);
-            setTipText("Well done, the array is fully sorted");
             setDone(true);
             //This isn't working, could just redirect them to an end screen?
         }
@@ -517,10 +425,10 @@ function Heap() {
             //newTree[1].ref = drag
             setTree(newTree);
             //console.log(tree.length);
-            setTipText("That's right! \nDrag the correct node to take the place of the old root node.");
+            setTipText(feedback["drag_new_root"]);
         }
         else {
-            setTipText("That's not quite right. \nWhich node always gets deleted in a heap?");
+            setTipText(feedback["wrong_new_root"]);
         }
     }
     //need to empty array as tree gets filled?
@@ -622,7 +530,7 @@ function Heap() {
         </div>);
     }
 
-    const displayHeap = () => {//need way to determine nodes in deletion mode 
+    const displayHeap = () => {//need way to determine nodes in deletion mode
         //root should be a button (to delete node an dadd to main array), then should be able to drag latest elemnt to root and shift stuff
         let result = [];
 
@@ -706,7 +614,12 @@ function Heap() {
 
     return (
         <>
-            {pageContents()}
+            <div id="outer-container">
+                <SideMenu pageWrapId={'page-wrap'} outerContainerId={'outer-container'} algorithm="heap" />
+                <div id="page-wrap">
+                    {pageContents()}
+                </div>
+            </div>
         </>
     );
 }

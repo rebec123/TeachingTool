@@ -391,3 +391,117 @@
     margin-left: auto;
     margin-right: auto;
 }
+.info-header {
+    margin-bottom: 15px;
+    margin-top: 0px;
+    font-size: 28px;
+}
+
+.info-desc {
+    text-align: left;
+    white-space: pre-wrap;
+    font-size: 21px;
+    background-color: var(--merge-light-colour);
+    padding: 15px;
+    margin-top: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.info-pseudo {
+    text-align: left;
+    white-space: pre-wrap;
+    font-size: 21px;
+    width:60%;
+    background-color: var(--merge-light-colour);
+    padding: 15px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: 20px;
+    float: left;
+}
+
+.code-style{
+    font-family: 'Courier New';
+    font-weight:500;
+}
+
+.info-time {
+    text-align: left;
+    white-space: pre-wrap;
+    width:36%;
+    font-size: 21px;
+    background-color: var(--merge-light-colour);
+    padding: 15px;
+    margin-top: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+    float: left;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+#page-wrap {
+    padding-bottom: 0px;
+    padding-top: 0px;
+}
+
+/* menu button styles below */
+.bm-burger-button {
+    position:absolute;
+    width: 36px;
+    height: 30px;
+    left: 20px;
+    top: 25px;
+}
+
+.bm-burger-bars {
+    background: white;
+}
+
+.bm-burger-bars-hover {
+    background: #00170D;
+}
+
+.bm-cross {
+    background: white;
+}
+.bm-cross-button:hover {
+    background: #00170D;
+}
+
+.bm-menu-wrap {
+    position: fixed;
+    height: 100%;
+}
+
+.bm-menu {
+    background: #00502F;
+    padding: 2.5em 1.5em 0;
+    font-size: 21px;
+    
+}
+
+.bm-item-list {
+    color: #b8b7ad;
+    padding: 0.8em;
+}
+
+.bm-item {
+    display: inline-block;
+    color: white;
+    margin-bottom: 10px;
+    text-align: left;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.bm-item:hover {
+    background: #00170D;
+}
+
+.bm-overlay {
+    background: rgba(0, 0, 0, 0.2);
+}
