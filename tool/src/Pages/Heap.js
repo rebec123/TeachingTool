@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useDrop, useDrag } from "react-dnd";
 import Confetti from 'react-confetti'
-import SideMenu from '../Components/SideMenu';
+import SideMenu from '../Components/SideMenu.js';
 import "./Heap.css";
 
 //A dictionary of feedback

@@ -1,4 +1,4 @@
-import SideMenu from '../Components/SideMenu';
+import SideMenu from '../Components/SideMenu.js';
 import "./Merge.css";
 
 //A page of additional information about merge sort

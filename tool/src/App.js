@@ -9,11 +9,11 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
 import "./App.css";
-import About from "./Pages/About";
-import Merge from "./Pages/Merge";
-import Heap from "./Pages/Heap";
-import MergeInfo from "./Pages/MergeInfo";
-import HeapInfo from "./Pages/HeapInfo";
+import About from "./Pages/About.js";
+import Merge from "./Pages/Merge.js";
+import Heap from "./Pages/Heap.js";
+import MergeInfo from "./Pages/MergeInfo.js";
+import HeapInfo from "./Pages/HeapInfo.js";
 
 //Different menu options as js equivalent of contants
 const Algorithm = Object.freeze({
@@ -48,15 +48,15 @@ function Menu() {
         if (algoChoice === Algorithm.None) {
             return (
                 <div>
-                    <button className="btn-menu" onClick={() => { onMergeClick() }} >
+                    <button className="btn-menu" data-testid="menu-merge" onClick={() => { onMergeClick() }} >
                         Merge Sort
                     </button>
                     <br/>
-                    <button className="btn-menu" onClick={() => { onHeapClick() }}>
+                    <button className="btn-menu" data-testid="menu-heap"  onClick={() => { onHeapClick() }}>
                         Heap Sort
                     </button>
                     <br />
-                    <button className="btn-menu" onClick={() => { onAboutClick() }}>
+                    <button className="btn-menu" data-testid="menu-about"  onClick={() => { onAboutClick() }}>
                         About
                     </button>
 

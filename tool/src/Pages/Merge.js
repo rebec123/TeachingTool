@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useDrop, useDrag } from "react-dnd";
-import cloneDeep from 'lodash/cloneDeep';//Need deep clones to ensure each split array can be rearranged w/o effecting all arrays
+import cloneDeep from 'lodash/cloneDeep.js';//Need deep clones to ensure each split array can be rearranged w/o effecting all arrays
 import Confetti from 'react-confetti'
-import SideMenu from '../Components/SideMenu';
+import SideMenu from '../Components/SideMenu.js';
+import MergeHelpers from '../Pages/MergeHelpers.js'
 import "./Merge.css";
+
 
 //A dictionary of feedback
 const feedback = {
@@ -41,7 +43,7 @@ function Element({ id, contents, style }) {
 
 //Given a div (a position in the visualisation representing a sub-array), 
 //this function returns the array elements that should be in that sub array
-const getElementsByDiv = (div) => {
+function getElementsByDiv(div) {
     let parentLen = 0;
     let lowerBound = 0;
     let upperBound = 0;
@@ -83,7 +85,7 @@ const getElementsByDiv = (div) => {
         let divHalved = div / 2;
         parent = getElementsByDiv(Math.floor(divHalved));
         if (divHalved - Math.floor(divHalved) === 0) {
-            return cloneDeep(getChildLeft(parent));
+            return cloneDeep(MergeHelpers.getChildLeft(parent));
         }
         else if (divHalved - Math.floor(divHalved) === 0.5) {
             return cloneDeep(getChildRight(parent));
@@ -101,7 +103,7 @@ const getElementsByDiv = (div) => {
 
 //Given a parent array, this function returns the children that would appear
 //To the left of the array (the left half of the array's elements)
-const getChildLeft = (parent) => {
+/*const getChildLeft = (parent) => {
     if (parent.length === 1) {
         return [{contents: ""}];
     }
@@ -114,7 +116,7 @@ const getChildLeft = (parent) => {
     else {
         return ['Sub array length unexpected'];
     }
-}
+}*/
 
 //Given a parent array, this function returns the children that would appear
 //To the right of the array (the right half of the array's elements)
@@ -327,7 +329,7 @@ function Merge() {
                 addButton = <button className="btn-split-disabled" onClick={() => onSplitClick(div)} disabled>split</button>;
             }
             else {
-                addButton = <button className="btn-split" onClick={() => onSplitClick(div)} >split</button>;
+                addButton = <button className="btn-split" data-testid="btn-split" onClick={() => onSplitClick(div)} >split</button>;
             }
         }
         return addButton;
@@ -634,5 +636,4 @@ function Merge() {
         </>
     );
 }
-
 export default Merge;
