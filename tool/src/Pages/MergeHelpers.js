@@ -5,7 +5,7 @@ const MergeHelpers = {
 
     //Given a parent array, this function returns the children that would appear
     //To the left of the array (the left half of the array's elements)
-    getChildLeft: function (parent) {
+    getChildLeft: function(parent) {
         if (parent.length === 1) {
             return [{ contents: "" }];
         }
@@ -22,7 +22,7 @@ const MergeHelpers = {
 
     //Given a parent array, this function returns the children that would appear
     //To the right of the array (the right half of the array's elements)
-    getChildRight: function (parent) {
+    getChildRight: function(parent) {
         if (parent.length === 1) {
             return [{ contents: "" }];
         }
@@ -42,7 +42,7 @@ const MergeHelpers = {
 
     //Given a div (a position in the visualisation representing a sub-array),
     //this function returns the array elements that should be in that sub array
-    getElementsByDiv: function (div, elementList) {
+    getElementsByDiv: function(div, elementList) {
         let parentLen = 0;
         let lowerBound = 0;
         let upperBound = 0;
@@ -103,27 +103,25 @@ const MergeHelpers = {
         }
     },
     //Randomly generates an array to sort. The length is between 6-16 and the elements can be 1-10
-    createArray: function (arrayCreated) {
+    createArray: function() {
         let elementList = [];
-        if (arrayCreated === false) {
-            arrayCreated = true
-            let length = Math.floor((Math.random() * 11) + 6);//((max-min +1) + min)
-            for (let i = 0; i < length; i++) {
-                elementList.push({
-                    id: i + 1,
-                    contents: Math.floor(Math.random() * 9) + 1////((max-min +1) + min)
-                });
-            }
-            return elementList;
+        let length = Math.floor((Math.random() * 11) + 6);//((max-min +1) + min)
+        for (let i = 0; i < length; i++) {
+            elementList.push({
+                id: i + 1,
+                contents: Math.floor(Math.random() * 9) + 1////((max-min +1) + min)
+            });
         }
+        return elementList;
     },
-    divContents: function () {
-        MergeHelpers.createArray();
+    //Determines what should be displayed in each div
+    divContents: function(elementList) {
+        //MergeHelpers.createArray();
         let allNewArrays = [];
         allNewArrays.push({});
         for (let i = 1; i <= _kMaxNumOfDivs; i++) {
             let _merged = false;
-            let _contents = MergeHelpers.getElementsByDiv(i);
+            let _contents = MergeHelpers.getElementsByDiv(i, elementList);
             if (_contents.length <= 1) {
                 _merged = true;
             }

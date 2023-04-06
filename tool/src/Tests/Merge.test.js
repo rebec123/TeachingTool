@@ -1,9 +1,8 @@
 import MergeHelpers from '../Pages/MergeHelpers.js'
-test("Sanity check", () => {
-    expect(true).toBe(true);
-});
 
-//const MergeHelpers = require('../Pages/MergeHelpers.js');
+const elementList6 = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }, { id: 6 }];
+const elementList16 = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }, { id: 6 }, { id: 7 },
+{ id: 8 }, { id: 9 }, { id: 10 }, { id: 11 }, { id: 12 }, { id: 13 }, { id: 14 }, { id: 15 }, { id: 16 }];
 
 //getChildLeft tests
 describe("Getting left child test, length=3", () => {
@@ -62,8 +61,6 @@ describe("Getting right child test, length=10", () => {
 })
 
 //getElementsByDiv tests
-
-const elementList6 = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }, { id: 6 }];
 describe("Getting the contents of div 1", () => {
     test('Div 1 for array "elementList6" should return itself', () => {
         expect(MergeHelpers.getElementsByDiv(1, elementList6)).toStrictEqual(elementList6);
@@ -88,8 +85,6 @@ describe("Expecting empty div", () => {
     });
 })
 
-const elementList16 = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }, { id: 6 }, { id: 7 },
-    { id: 8 }, { id: 9 }, { id: 10 }, { id: 11 }, { id: 12 }, { id: 13 }, { id: 14 }, { id: 15 }, { id: 16 }];
 describe("Getting the contents of div 3", () => {
     test('Div 3 for array "elementList15" should return the second half of the array 9...16', () => {
         expect(MergeHelpers.getElementsByDiv(3, elementList16)).toStrictEqual([{ id: 9 }, { id: 10 }, { id: 11 }, { id: 12 }, { id: 13 }, { id: 14 }, { id: 15 }, { id: 16 }]);
@@ -148,9 +143,27 @@ describe("Checking createArray creates arrays with correct contents", () => {
     });
 })
 
-describe("Check doesn't create and array twice", () => {
-    test('Pass createArray true and get "undefined"', () => {
-        let test = MergeHelpers.createArray(true);
-        expect(test).toStrictEqual(undefined);
+//divContents tests
+describe("Checking div contents for 15 div visualisation (4 rows)", () => {
+    test('Give element list of length 6, expect divs to have correct splits', () => {
+        let test = MergeHelpers.divContents(elementList6);
+        expect(test[1].contents.length).toBe(6);
+        expect(test[2].contents.length).toBe(3);
+        expect(test[4].contents[0]).toStrictEqual({id:1});
+        expect(test[16].contents).toStrictEqual([{contents:""}]);
+    });
+})
+
+describe("Checking div contents for 31 div visualisation (5 rows)", () => {
+    test('Give element list of length 16, expect divs to have correct splits', () => {
+        let test = MergeHelpers.divContents(elementList16);
+        expect(test[1].contents.length).toBe(16);
+        expect(test[2].contents.length).toBe(8);
+        expect(test[4].contents.length).toBe(4);
+        expect(test[8].contents.length).toBe(2);
+        expect(test[16].contents.length).toBe(1);
+        expect(test[4].contents[0]).toStrictEqual({ id: 1 });
+        expect(test[4].contents[1]).toStrictEqual({ id: 2 });
+        expect(test[31].contents).not.toStrictEqual([{ contents: "" }]);
     });
 })

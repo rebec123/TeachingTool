@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useDrop, useDrag } from "react-dnd";
 import Confetti from 'react-confetti'
 import SideMenu from '../Components/SideMenu.js';
+import HeapHelpers from '../Pages/HeapHelpers.js'
 import "./Heap.css";
 
 //A dictionary of feedback
@@ -27,7 +28,7 @@ const feedback = {
 }
 
 //The array being sorted
-const elementList = []
+const elementList = HeapHelpers.createArray();
 
 //An element of the array/heap that is draggable
 function Element({ id, contents }) {
@@ -41,41 +42,9 @@ function Element({ id, contents }) {
     return (<div className="ar-el-bare" ref={drag}>{contents}</div>);
 }
 
-//React loads twice, so need to make sure list is only created once
-let arrayCreated = false;
-//Randomly generates an array between 6 and 15 elements. Elements range from 1-10
-function createArray() {
-    if (arrayCreated === false) {
-        arrayCreated = true
-        let length = Math.floor((Math.random() * 10) + 6);//((max-min +1) + min)
-        for (let i = 0; i < length; i++) {
-            elementList.push({
-                id: i + 1,
-                contents: Math.floor(Math.random() * 9) + 1//((max-min +1) + min)
-            });
-        }
-        return elementList;
-    }
-}
-
-//Filling the heap with empty nodes
-const treeSetUp = () => {
-    let result = [];
-    createArray();
-    result.push({});
-    for (let i = 1; i <= elementList.length; i++) {
-        result.push({
-            id: i,
-            contents: "",
-            ref: undefined
-        });
-    }
-    return result;
-}
-
 function Heap() {
     const [tipText, setTipText] = useState(feedback["insert_click"]);
-    const [tree, setTree] = useState(treeSetUp());//The tree (heap) structure represented as an array of objects
+    const [tree, setTree] = useState(HeapHelpers.treeSetUp(elementList));//The tree (heap) structure represented as an array of objects
     const [topArray, setTopArray] = useState(elementList);//The arrays being sorted
     const [arIndex, setArIndex] = useState(0);//Current index of array
     const [mode, setMode] = useState("insertion");//Indicates if user is populating tree or deleting
