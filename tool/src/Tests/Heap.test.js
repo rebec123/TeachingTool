@@ -1,6 +1,3 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import App from '../App.js';
 import HeapHelpers from '../Pages/HeapHelpers.js'
 
 const elementList6 = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }, { id: 6 }];
